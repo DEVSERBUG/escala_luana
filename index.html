@@ -3,22 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema de Controle de Escalas</title>
+    <title>Login - Sistema de Escalas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Vou incluir o CSS direto para garantir funcionamento */
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -27,1873 +14,301 @@
         }
 
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            padding: 15px;
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--primary-color);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-        }
-
-        h1 i {
-            color: var(--secondary-color);
-        }
-
-        .header-controls {
-            position: relative;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: var(--box-shadow);
-            border-radius: var(--border-radius);
-            z-index: 1000;
-            padding: 10px 0;
-        }
-
-        .dropdown:hover .dropdown-menu {
-            display: block;
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 10px 20px;
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-
-        .dropdown-menu a:hover {
-            background-color: #f5f5f5;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab-btn {
-            padding: 10px 15px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--secondary-color);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            flex: 1;
-            min-width: 120px;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #219653;
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background-color: #e67e22;
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-
-        .week-navigation {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            background-color: white;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .week-display {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            text-align: center;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .schedule-container, .sector-container {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: auto;
-            margin-bottom: 20px;
-            -webkit-overflow-scrolling: touch;
-            max-height: 60vh;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-size: 0.9rem;
-        }
-
-        th:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 20;
-            background-color: var(--primary-color);
-            min-width: 150px;
-        }
-
-        td {
-            padding: 10px 8px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            min-width: 130px;
-        }
-
-        td:first-child {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            font-weight: 600;
-            border-right: 2px solid #eee;
-            z-index: 5;
-            min-width: 150px;
-        }
-
-        .day-date {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: normal;
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 3px;
-        }
-
-        .shift-cell, .sector-cell {
-            cursor: pointer;
-            transition: all 0.2s;
-            min-height: 50px;
-            vertical-align: middle;
-        }
-
-        .shift-cell:hover, .sector-cell:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
-        }
-
-        .shift-label {
-            font-weight: 600;
-            margin-bottom: 3px;
-            font-size: 0.9rem;
-        }
-
-        .shift-time {
-            font-size: 0.75rem;
-            color: #555;
-        }
-
-        .day-off {
-            background-color: rgba(236, 240, 241, 0.7);
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
-        .info-panels {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .employees-sidebar, .legend {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 15px;
-        }
-
-        .employees-sidebar h3, .legend h3 {
-            margin-bottom: 12px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
-        }
-
-        .employees-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .employee-card {
-            border-radius: var(--border-radius);
-            padding: 12px;
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .employee-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background-color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            flex-shrink: 0;
-            font-size: 0.9rem;
-        }
-
-        .employee-info h4 {
-            margin-bottom: 3px;
-            font-size: 0.9rem;
-        }
-
-        .employee-info p {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border-left: 4px solid #000;
-            flex-shrink: 0;
-        }
-
-        /* Modais */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
             justify-content: center;
             align-items: center;
-            padding: 15px;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: var(--border-radius);
             padding: 20px;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            padding: 40px 30px;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: #3498db;
             margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eee;
         }
 
-        .modal-header h3 {
-            font-size: 1.2rem;
+        .logo h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
         }
 
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+        .logo p {
             color: #7f8c8d;
-            padding: 5px;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            color: #2c3e50;
             font-weight: 600;
             font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.1rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 0.95rem;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
 
-        .shift-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 8px;
-            margin-top: 10px;
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
 
-        .shift-option {
-            padding: 10px;
-            text-align: center;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-            font-size: 0.9rem;
-        }
-
-        .shift-option.selected {
-            border-color: var(--primary-color);
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 600;
-            transform: scale(1.05);
-        }
-
-        .shift-form, .sector-form {
-            display: grid;
-            grid-template-columns: 1fr;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             gap: 10px;
         }
 
-        .existing-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 5px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            font-size: 0.9rem;
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(52, 152, 219, 0.3);
         }
 
-        .remove-item {
-            background: none;
-            border: none;
-            color: var(--danger-color);
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .user-types {
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .user-types h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .user-types-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .user-type {
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
             cursor: pointer;
-            padding: 5px;
         }
 
-        /* Mobile específico */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .week-navigation {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .employees-list {
-                grid-template-columns: 1fr;
-            }
-            
-            table {
-                min-width: 600px;
-            }
-            
-            th, td {
-                padding: 8px 5px;
-                font-size: 0.85rem;
-            }
-            
-            th:first-child, td:first-child {
-                min-width: 120px;
-            }
-            
-            .modal-content {
-                padding: 15px;
-            }
-            
-            .shift-options {
-                grid-template-columns: 1fr 1fr;
-            }
+        .user-type:hover {
+            border-color: #3498db;
+            background-color: white;
+        }
+
+        .user-type i {
+            font-size: 1.5rem;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+
+        .user-type span {
+            display: block;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .user-type small {
+            display: block;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c0392b;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+            text-align: center;
+            border: 1px solid #ffcdd2;
         }
 
         @media (max-width: 480px) {
-            h1 {
-                font-size: 1.1rem;
+            .login-container {
+                padding: 30px 20px;
             }
             
-            .tab-btn {
-                padding: 8px 10px;
-                font-size: 0.9rem;
+            .logo h1 {
+                font-size: 1.5rem;
             }
             
-            .btn {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-            
-            .week-display {
-                font-size: 0.9rem;
-                min-width: 100%;
-            }
-            
-            .shift-options {
+            .user-types-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        /* Notificações */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: var(--border-radius);
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            box-shadow: var(--box-shadow);
-            animation: slideIn 0.3s ease-out;
-            max-width: 300px;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-calendar-alt"></i> Controle de Escalas</h1>
-            <div class="header-controls">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle">
-                        <i class="fas fa-cog"></i> Gerenciar
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="#" id="addEmployeeBtn"><i class="fas fa-user-plus"></i> Novo Colaborador</a>
-                        <a href="#" id="manageShiftsBtn"><i class="fas fa-clock"></i> Gerenciar Turnos</a>
-                        <a href="#" id="removeEmployeeBtn"><i class="fas fa-user-minus"></i> Remover Colaborador</a>
-                        <a href="#" id="manageSectorsBtn"><i class="fas fa-store"></i> Gerenciar Setores</a>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="scale">Escala de Turnos</button>
-            <button class="tab-btn" data-tab="sector">Escala de Setores</button>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Sistema de Escalas</h1>
+            <p>Controle de turnos e setores</p>
         </div>
 
-        <!-- Aba de Escala de Turnos -->
-        <div class="tab-content active" id="scale-tab">
-            <div class="controls">
-                <button class="btn btn-primary" id="prevWeek">
-                    <i class="fas fa-chevron-left"></i> Anterior
-                </button>
-                <button class="btn btn-success" id="saveSchedule">
-                    <i class="fas fa-save"></i> Salvar
-                </button>
-                <button class="btn btn-primary" id="nextWeek">
-                    Próxima <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <div class="week-navigation">
-                <button class="btn btn-primary" id="todayBtn">
-                    <i class="fas fa-calendar-day"></i> Hoje
-                </button>
-                <div class="week-display" id="weekDisplay">Carregando...</div>
-                <button class="btn btn-primary" id="copyPrevWeek">
-                    <i class="fas fa-copy"></i> Copiar Anterior
-                </button>
-            </div>
-
-            <div class="schedule-container">
-                <table id="scheduleTable">
-                    <thead>
-                        <tr id="scheduleHeader">
-                            <!-- Dias serão gerados dinamicamente -->
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleBody">
-                        <!-- As linhas serão preenchidas via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Aba de Escala de Setores -->
-        <div class="tab-content" id="sector-tab">
-            <div class="controls">
-                <button class="btn btn-primary" id="prevWeekSector">
-                    <i class="fas fa-chevron-left"></i> Anterior
-                </button>
-                <button class="btn btn-success" id="saveSectorSchedule">
-                    <i class="fas fa-save"></i> Salvar
-                </button>
-                <button class="btn btn-primary" id="nextWeekSector">
-                    Próxima <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <div class="week-navigation">
-                <div class="week-display" id="weekDisplaySector">Carregando...</div>
-            </div>
-
-            <div class="sector-container">
-                <table id="sectorTable">
-                    <thead>
-                        <tr id="sectorHeader">
-                            <!-- Dias serão gerados dinamicamente -->
-                        </tr>
-                    </thead>
-                    <tbody id="sectorBody">
-                        <!-- Setores serão preenchidos via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="info-panels">
-            <div class="employees-sidebar">
-                <h3><i class="fas fa-users"></i> Colaboradores</h3>
-                <div class="employees-list" id="employeesList">
-                    <!-- Os cards de colaboradores serão preenchidos via JavaScript -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" class="form-control" placeholder="Digite seu usuário" required>
                 </div>
             </div>
 
-            <div class="legend">
-                <h3><i class="fas fa-info-circle"></i> Legenda</h3>
-                <div id="legendContent">
-                    <!-- Legenda será preenchida dinamicamente -->
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" class="form-control" placeholder="Digite sua senha" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+            </button>
+
+            <div class="error-message" id="errorMessage">
+                Usuário ou senha incorretos!
+            </div>
+        </form>
+
+        <div class="user-types">
+            <h3>Tipos de Acesso</h3>
+            <div class="user-types-grid">
+                <div class="user-type" onclick="fillCredentials('centauro235', 'centauro235')">
+                    <i class="fas fa-eye"></i>
+                    <span>Visualização</span>
+                    <small>Apenas consulta</small>
+                </div>
+                <div class="user-type" onclick="fillCredentials('Luana2354', 'cent4uro@235')">
+                    <i class="fas fa-edit"></i>
+                    <span>Edição</span>
+                    <small>Controle total</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Todos os modais serão criados dinamicamente via JavaScript -->
-    
     <script>
-        // ==============================
-        // BANCO DE DADOS (localStorage)
-        // ==============================
-        class Database {
-            constructor() {
-                this.initializeDB();
+        // Usuários válidos
+        const validUsers = {
+            'centauro235': {
+                password: 'centauro235',
+                type: 'view',
+                name: 'Colaborador'
+            },
+            'Luana2354': {
+                password: 'cent4uro@235',
+                type: 'admin',
+                name: 'Administrador'
             }
+        };
 
-            initializeDB() {
-                // Inicializar dados padrão se não existirem
-                if (!localStorage.getItem('employees')) {
-                    const defaultEmployees = [
-                        { id: 1, name: "BEATRIZ XIMENES", role: "ASSISTENTE DE LOJA" },
-                        { id: 2, name: "FABRICIO", role: "ASSISTENTE DE LOJA" },
-                        { id: 3, name: "MARINA", role: "Caixa" },
-                        { id: 4, name: "GABRIEL", role: "Estoquista" },
-                        { id: 5, name: "KEVEN", role: "Gerente" }
-                    ];
-                    this.saveEmployees(defaultEmployees);
-                }
+        // Preencher credenciais ao clicar nos tipos
+        function fillCredentials(user, pass) {
+            document.getElementById('username').value = user;
+            document.getElementById('password').value = pass;
+            document.getElementById('username').focus();
+        }
 
-                if (!localStorage.getItem('shifts')) {
-                    const defaultShifts = [
-                        { id: 1, name: "Abertura", time: "06:00 - 14:00", color: "#3498db" },
-                        { id: 2, name: "Intermediário", time: "14:00 - 22:00", color: "#f39c12" },
-                        { id: 3, name: "Fechamento", time: "22:00 - 06:00", color: "#e74c3c" },
-                        { id: 4, name: "Folga", time: "Dia Livre", color: "#95a5a6" }
-                    ];
-                    this.saveShifts(defaultShifts);
-                }
-
-                if (!localStorage.getItem('sectors')) {
-                    const defaultSectors = [
-                        { id: 1, name: "Masculino" },
-                        { id: 2, name: "Feminino" },
-                        { id: 3, name: "Infantil" },
-                        { id: 4, name: "Calçados" },
-                        { id: 5, name: "Caixa" },
-                        { id: 6, name: "Estoque" }
-                    ];
-                    this.saveSectors(defaultSectors);
-                }
-
-                if (!localStorage.getItem('schedule')) {
-                    this.saveSchedule({});
-                }
-
-                if (!localStorage.getItem('sectorSchedule')) {
-                    this.saveSectorSchedule({});
-                }
-            }
-
-            // ========== FUNCIONÁRIOS ==========
-            getEmployees() {
-                return JSON.parse(localStorage.getItem('employees')) || [];
-            }
-
-            saveEmployees(employees) {
-                localStorage.setItem('employees', JSON.stringify(employees));
-            }
-
-            addEmployee(employee) {
-                const employees = this.getEmployees();
-                const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
-                employee.id = newId;
-                employees.push(employee);
-                this.saveEmployees(employees);
-                return employee;
-            }
-
-            removeEmployee(id) {
-                let employees = this.getEmployees();
-                employees = employees.filter(emp => emp.id !== id);
-                this.saveEmployees(employees);
-                return true;
-            }
-
-            // ========== TURNOS ==========
-            getShifts() {
-                return JSON.parse(localStorage.getItem('shifts')) || [];
-            }
-
-            saveShifts(shifts) {
-                localStorage.setItem('shifts', JSON.stringify(shifts));
-            }
-
-            addShift(shift) {
-                const shifts = this.getShifts();
-                const newId = shifts.length > 0 ? Math.max(...shifts.map(s => s.id)) + 1 : 1;
-                shift.id = newId;
-                shifts.push(shift);
-                this.saveShifts(shifts);
-                return shift;
-            }
-
-            removeShift(id) {
-                let shifts = this.getShifts();
-                shifts = shifts.filter(shift => shift.id !== id);
-                this.saveShifts(shifts);
-                return true;
-            }
-
-            // ========== SETORES ==========
-            getSectors() {
-                return JSON.parse(localStorage.getItem('sectors')) || [];
-            }
-
-            saveSectors(sectors) {
-                localStorage.setItem('sectors', JSON.stringify(sectors));
-            }
-
-            addSector(sector) {
-                const sectors = this.getSectors();
-                const newId = sectors.length > 0 ? Math.max(...sectors.map(s => s.id)) + 1 : 1;
-                sector.id = newId;
-                sectors.push(sector);
-                this.saveSectors(sectors);
-                return sector;
-            }
-
-            removeSector(id) {
-                let sectors = this.getSectors();
-                sectors = sectors.filter(sector => sector.id !== id);
-                this.saveSectors(sectors);
-                return true;
-            }
-
-            // ========== ESCALAS ==========
-            getSchedule() {
-                return JSON.parse(localStorage.getItem('schedule')) || {};
-            }
-
-            saveSchedule(schedule) {
-                localStorage.setItem('schedule', JSON.stringify(schedule));
-            }
-
-            getSectorSchedule() {
-                return JSON.parse(localStorage.getItem('sectorSchedule')) || {};
-            }
-
-            saveSectorSchedule(schedule) {
-                localStorage.setItem('sectorSchedule', JSON.stringify(schedule));
-            }
-
-            // ========== UTILIDADES ==========
-            getWeekStartDate(date) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-                const weekStart = new Date(d.setDate(diff));
-                weekStart.setHours(0, 0, 0, 0);
-                return weekStart;
-            }
-
-            getWeekKey(date) {
-                const year = date.getFullYear();
-                const weekNumber = this.getWeekNumber(date);
-                return `${year}-W${weekNumber}`;
-            }
-
-            getWeekNumber(date) {
-                const d = new Date(date);
-                d.setHours(0, 0, 0, 0);
-                d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-                const yearStart = new Date(d.getFullYear(), 0, 1);
-                const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-                return weekNo;
-            }
-
-            getWeekDates(startDate) {
-                const dates = [];
-                const current = new Date(startDate);
+        // Processar login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Verificar credenciais
+            if (validUsers[username] && validUsers[username].password === password) {
+                // Salvar dados do usuário na sessão
+                sessionStorage.setItem('user', JSON.stringify({
+                    username: username,
+                    type: validUsers[username].type,
+                    name: validUsers[username].name
+                }));
                 
-                for (let i = 0; i < 7; i++) {
-                    const date = new Date(current);
-                    date.setDate(current.getDate() + i);
-                    dates.push(date);
-                }
-                
-                return dates;
-            }
-
-            formatDate(date) {
-                return date.toLocaleDateString('pt-BR', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric' 
-                });
-            }
-
-            formatDayName(date) {
-                const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-                return days[date.getDay()];
-            }
-        }
-
-        // ==============================
-        // APLICAÇÃO PRINCIPAL
-        // ==============================
-        const db = new Database();
-        let currentWeekStart = db.getWeekStartDate(new Date());
-        let currentTab = 'scale';
-        let currentEditing = { employeeId: null, dayIndex: null, type: null };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            initApp();
-        });
-
-        function initApp() {
-            console.log('Iniciando aplicação...');
-            renderEmployees();
-            renderSchedule();
-            renderSectorSchedule();
-            updateWeekDisplay();
-            updateSectorWeekDisplay();
-            renderLegend();
-            setupEventListeners();
-            createModals();
-            
-            showNotification('Sistema carregado com sucesso!', 'success');
-        }
-
-        function setupEventListeners() {
-            // Tabs
-            document.querySelectorAll('.tab-btn').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    this.classList.add('active');
-                    currentTab = this.dataset.tab;
-                    document.getElementById(`${currentTab}-tab`).classList.add('active');
-                });
-            });
-
-            // Navegação entre semanas - Escala
-            document.getElementById('prevWeek').addEventListener('click', () => navigateWeek(-7));
-            document.getElementById('nextWeek').addEventListener('click', () => navigateWeek(7));
-            document.getElementById('todayBtn').addEventListener('click', goToToday);
-            document.getElementById('copyPrevWeek').addEventListener('click', copyPreviousWeek);
-            document.getElementById('saveSchedule').addEventListener('click', () => {
-                showNotification('Escala salva com sucesso!', 'success');
-            });
-
-            // Navegação entre semanas - Setores
-            document.getElementById('prevWeekSector').addEventListener('click', () => navigateSectorWeek(-7));
-            document.getElementById('nextWeekSector').addEventListener('click', () => navigateSectorWeek(7));
-            document.getElementById('saveSectorSchedule').addEventListener('click', () => {
-                showNotification('Escala de setores salva com sucesso!', 'success');
-            });
-
-            // Menu dropdown para mobile
-            document.querySelector('.dropdown-toggle').addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    const menu = this.nextElementSibling;
-                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                }
-            });
-
-            // Fechar dropdown ao clicar fora (mobile)
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    const dropdown = document.querySelector('.dropdown');
-                    if (!dropdown.contains(e.target)) {
-                        dropdown.querySelector('.dropdown-menu').style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        function createModals() {
-            // Criar todos os modais dinamicamente
-            createEmployeeModal();
-            createRemoveEmployeeModal();
-            createShiftsModal();
-            createSectorsModal();
-            createScheduleModal();
-            createSectorModal();
-            
-            // Vincular eventos dos modais
-            bindModalEvents();
-        }
-
-        function bindModalEvents() {
-            // Modal de colaborador
-            document.getElementById('addEmployeeBtn').addEventListener('click', openEmployeeModal);
-            
-            // Modal de remover colaborador
-            document.getElementById('removeEmployeeBtn').addEventListener('click', openRemoveEmployeeModal);
-            
-            // Modal de turnos
-            document.getElementById('manageShiftsBtn').addEventListener('click', openShiftsModal);
-            
-            // Modal de setores
-            document.getElementById('manageSectorsBtn').addEventListener('click', openSectorsModal);
-        }
-
-        // ========== FUNÇÕES DE RENDERIZAÇÃO ==========
-        function renderEmployees() {
-            const employees = db.getEmployees();
-            const employeesList = document.getElementById('employeesList');
-            
-            if (employees.length === 0) {
-                employeesList.innerHTML = '<p style="color: #999; font-style: italic; text-align: center; padding: 20px;">Nenhum colaborador cadastrado. Clique em "Gerenciar" para adicionar.</p>';
-                return;
-            }
-            
-            employeesList.innerHTML = '';
-            
-            employees.forEach(employee => {
-                const employeeCard = document.createElement('div');
-                employeeCard.className = 'employee-card';
-                
-                const initials = employee.name.split(' ').map(n => n[0]).join('').toUpperCase();
-                
-                employeeCard.innerHTML = `
-                    <div class="employee-avatar">${initials.substring(0, 2)}</div>
-                    <div class="employee-info">
-                        <h4>${employee.name}</h4>
-                        <p>${employee.role}</p>
-                    </div>
-                `;
-                
-                employeesList.appendChild(employeeCard);
-            });
-        }
-
-        function renderSchedule() {
-            const employees = db.getEmployees();
-            const schedule = db.getSchedule();
-            const scheduleBody = document.getElementById('scheduleBody');
-            const scheduleHeader = document.getElementById('scheduleHeader');
-            
-            // Limpar conteúdo
-            scheduleBody.innerHTML = '';
-            
-            // Obter datas da semana
-            const weekDates = db.getWeekDates(currentWeekStart);
-            const weekKey = db.getWeekKey(currentWeekStart);
-            
-            // Atualizar cabeçalho com datas
-            let headerHTML = '<th>Colaborador</th>';
-            weekDates.forEach((date, index) => {
-                const dayName = db.formatDayName(date);
-                const dateStr = db.formatDate(date);
-                headerHTML += `<th>${dayName}<br><span class="day-date">${dateStr}</span></th>`;
-            });
-            scheduleHeader.innerHTML = headerHTML;
-            
-            // Inicializar schedule para a semana atual se não existir
-            if (!schedule[weekKey]) {
-                schedule[weekKey] = {};
-                db.saveSchedule(schedule);
-            }
-            
-            // Renderizar linhas dos colaboradores
-            employees.forEach(employee => {
-                const row = document.createElement('tr');
-                
-                // Coluna do nome
-                const nameCell = document.createElement('td');
-                nameCell.textContent = employee.name;
-                row.appendChild(nameCell);
-                
-                // Colunas para cada dia
-                weekDates.forEach((date, dayIndex) => {
-                    const dayCell = document.createElement('td');
-                    dayCell.className = 'shift-cell';
-                    
-                    // Verificar escala existente
-                    const employeeSchedule = schedule[weekKey][employee.id] || {};
-                    const shiftId = employeeSchedule[dayIndex];
-                    
-                    if (shiftId) {
-                        const shift = db.getShifts().find(s => s.id === shiftId);
-                        if (shift) {
-                            dayCell.innerHTML = `
-                                <div class="shift-label">${shift.name}</div>
-                                <div class="shift-time">${shift.time}</div>
-                            `;
-                            dayCell.style.borderLeft = `4px solid ${shift.color}`;
-                            dayCell.style.backgroundColor = `${shift.color}20`;
-                        }
-                    } else {
-                        dayCell.innerHTML = '<div style="color: #aaa; font-style: italic; font-size: 0.8rem;">Clique para definir</div>';
-                    }
-                    
-                    dayCell.addEventListener('click', () => openScheduleModal(employee.id, dayIndex, employee.name, date));
-                    row.appendChild(dayCell);
-                });
-                
-                scheduleBody.appendChild(row);
-            });
-        }
-
-        function renderSectorSchedule() {
-            const employees = db.getEmployees();
-            const schedule = db.getSectorSchedule();
-            const sectorBody = document.getElementById('sectorBody');
-            const sectorHeader = document.getElementById('sectorHeader');
-            
-            sectorBody.innerHTML = '';
-            
-            const weekDates = db.getWeekDates(currentWeekStart);
-            const weekKey = db.getWeekKey(currentWeekStart);
-            
-            // Atualizar cabeçalho
-            let headerHTML = '<th>Colaborador</th>';
-            weekDates.forEach((date, index) => {
-                const dayName = db.formatDayName(date);
-                const dateStr = db.formatDate(date);
-                headerHTML += `<th>${dayName}<br><span class="day-date">${dateStr}</span></th>`;
-            });
-            sectorHeader.innerHTML = headerHTML;
-            
-            // Inicializar schedule se não existir
-            if (!schedule[weekKey]) {
-                schedule[weekKey] = {};
-                db.saveSectorSchedule(schedule);
-            }
-            
-            // Renderizar linhas
-            employees.forEach(employee => {
-                const row = document.createElement('tr');
-                
-                const nameCell = document.createElement('td');
-                nameCell.textContent = employee.name;
-                row.appendChild(nameCell);
-                
-                weekDates.forEach((date, dayIndex) => {
-                    const dayCell = document.createElement('td');
-                    dayCell.className = 'sector-cell';
-                    
-                    const employeeSchedule = schedule[weekKey][employee.id] || {};
-                    const sectorId = employeeSchedule[dayIndex];
-                    
-                    if (sectorId) {
-                        const sector = db.getSectors().find(s => s.id === sectorId);
-                        if (sector) {
-                            dayCell.innerHTML = `<div class="shift-label">${sector.name}</div>`;
-                            dayCell.style.backgroundColor = '#e8f5e9';
-                            dayCell.style.borderLeft = '4px solid #27ae60';
-                        }
-                    } else {
-                        dayCell.innerHTML = '<div style="color: #aaa; font-style: italic; font-size: 0.8rem;">Clique para definir</div>';
-                    }
-                    
-                    dayCell.addEventListener('click', () => openSectorModal(employee.id, dayIndex, employee.name, date));
-                    row.appendChild(dayCell);
-                });
-                
-                sectorBody.appendChild(row);
-            });
-        }
-
-        function renderLegend() {
-            const shifts = db.getShifts();
-            const legendContent = document.getElementById('legendContent');
-            
-            let legendHTML = '';
-            
-            shifts.forEach(shift => {
-                if (shift.name !== 'Folga') {
-                    legendHTML += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="border-left-color: ${shift.color}; background-color: ${shift.color}20"></div>
-                            <div>
-                                <strong>${shift.name}</strong><br>
-                                <small>${shift.time}</small>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            
-            // Adicionar folga separadamente
-            const folga = shifts.find(s => s.name === 'Folga');
-            if (folga) {
-                legendHTML += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="border-left-color: ${folga.color}; background-color: ${folga.color}20"></div>
-                        <div>
-                            <strong>${folga.name}</strong><br>
-                            <small>${folga.time}</small>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            legendContent.innerHTML = legendHTML;
-        }
-
-        // ========== FUNÇÕES DE NAVEGAÇÃO ==========
-        function updateWeekDisplay() {
-            const weekStart = new Date(currentWeekStart);
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekEnd.getDate() + 6);
-            
-            const weekStartStr = db.formatDate(weekStart);
-            const weekEndStr = db.formatDate(weekEnd);
-            
-            document.getElementById('weekDisplay').textContent = 
-                `Semana: ${weekStartStr} a ${weekEndStr}`;
-        }
-
-        function updateSectorWeekDisplay() {
-            const weekStart = new Date(currentWeekStart);
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekEnd.getDate() + 6);
-            
-            const weekStartStr = db.formatDate(weekStart);
-            const weekEndStr = db.formatDate(weekEnd);
-            
-            document.getElementById('weekDisplaySector').textContent = 
-                `Semana: ${weekStartStr} a ${weekEndStr}`;
-        }
-
-        function navigateWeek(days) {
-            currentWeekStart.setDate(currentWeekStart.getDate() + days);
-            updateWeekDisplay();
-            renderSchedule();
-        }
-
-        function navigateSectorWeek(days) {
-            currentWeekStart.setDate(currentWeekStart.getDate() + days);
-            updateSectorWeekDisplay();
-            renderSectorSchedule();
-        }
-
-        function goToToday() {
-            currentWeekStart = db.getWeekStartDate(new Date());
-            updateWeekDisplay();
-            updateSectorWeekDisplay();
-            renderSchedule();
-            renderSectorSchedule();
-        }
-
-        function copyPreviousWeek() {
-            const currentWeekKey = db.getWeekKey(currentWeekStart);
-            const prevWeek = new Date(currentWeekStart);
-            prevWeek.setDate(prevWeek.getDate() - 7);
-            const prevWeekKey = db.getWeekKey(prevWeek);
-            
-            const schedule = db.getSchedule();
-            
-            if (schedule[prevWeekKey]) {
-                schedule[currentWeekKey] = JSON.parse(JSON.stringify(schedule[prevWeekKey]));
-                db.saveSchedule(schedule);
-                renderSchedule();
-                showNotification('Escala da semana anterior copiada!', 'success');
+                // Redirecionar para o dashboard
+                window.location.href = 'dashboard.html';
             } else {
-                showNotification('Não há escala na semana anterior.', 'warning');
-            }
-        }
-
-        // ========== FUNÇÕES DOS MODAIS ==========
-        function createEmployeeModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'employeeModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Adicionar Colaborador</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <form id="employeeForm">
-                        <div class="form-group">
-                            <label for="employeeName">Nome do Colaborador *</label>
-                            <input type="text" id="employeeName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="employeeRole">Cargo/Função *</label>
-                            <input type="text" id="employeeRole" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-save"></i> Salvar Colaborador
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de colaborador
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#employeeForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = document.getElementById('employeeName').value.trim();
-                const role = document.getElementById('employeeRole').value.trim();
-                
-                if (!name || !role) {
-                    showNotification('Preencha todos os campos!', 'warning');
-                    return;
-                }
-                
-                const newEmployee = { name, role };
-                db.addEmployee(newEmployee);
-                
-                renderEmployees();
-                renderSchedule();
-                renderSectorSchedule();
-                modal.style.display = 'none';
-                this.reset();
-                
-                showNotification(`Colaborador ${name} adicionado!`, 'success');
-            });
-        }
-
-        function openEmployeeModal() {
-            document.getElementById('employeeModal').style.display = 'flex';
-            document.getElementById('employeeName').focus();
-        }
-
-        function createRemoveEmployeeModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'removeEmployeeModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Remover Colaborador</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="form-group">
-                        <label>Selecione o colaborador:</label>
-                        <select id="employeeToRemove" class="form-control">
-                            <!-- Opções serão preenchidas dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-danger" id="confirmRemove" style="width: 100%;">
-                            <i class="fas fa-trash"></i> Remover Colaborador
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de remover
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#confirmRemove').addEventListener('click', function() {
-                const select = document.getElementById('employeeToRemove');
-                const employeeId = parseInt(select.value);
-                
-                if (!employeeId) {
-                    showNotification('Selecione um colaborador!', 'warning');
-                    return;
-                }
-                
-                const employee = db.getEmployees().find(e => e.id === employeeId);
-                
-                if (confirm(`Tem certeza que deseja remover ${employee.name}?`)) {
-                    db.removeEmployee(employeeId);
-                    
-                    renderEmployees();
-                    renderSchedule();
-                    renderSectorSchedule();
-                    modal.style.display = 'none';
-                    
-                    showNotification('Colaborador removido!', 'success');
-                }
-            });
-        }
-
-        function openRemoveEmployeeModal() {
-            const select = document.getElementById('employeeToRemove');
-            const employees = db.getEmployees();
-            
-            select.innerHTML = '';
-            employees.forEach(employee => {
-                const option = document.createElement('option');
-                option.value = employee.id;
-                option.textContent = `${employee.name} - ${employee.role}`;
-                select.appendChild(option);
-            });
-            
-            document.getElementById('removeEmployeeModal').style.display = 'flex';
-        }
-
-        function createShiftsModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'shiftsModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Gerenciar Turnos</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="form-group">
-                        <h4>Turnos Existentes</h4>
-                        <div id="existingShifts">
-                            <!-- Turnos serão listados aqui -->
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <h4>Adicionar Novo Turno</h4>
-                        <div class="shift-form">
-                            <input type="text" id="newShiftName" class="form-control" placeholder="Nome do Turno">
-                            <input type="text" id="newShiftTime" class="form-control" placeholder="Horário (ex: 08:00-12:00)">
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <label style="font-size: 0.9rem;">Cor:</label>
-                                <input type="color" id="newShiftColor" value="#3498db" style="flex: 1;">
-                            </div>
-                            <button class="btn btn-primary" id="addShiftBtn">Adicionar Turno</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de turnos
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#addShiftBtn').addEventListener('click', function() {
-                const name = document.getElementById('newShiftName').value.trim();
-                const time = document.getElementById('newShiftTime').value.trim();
-                const color = document.getElementById('newShiftColor').value;
-                
-                if (!name || !time) {
-                    showNotification('Preencha nome e horário!', 'warning');
-                    return;
-                }
-                
-                const newShift = { name, time, color };
-                db.addShift(newShift);
-                
-                document.getElementById('newShiftName').value = '';
-                document.getElementById('newShiftTime').value = '';
-                
-                renderExistingShifts();
-                renderLegend();
-                renderSchedule();
-                
-                showNotification(`Turno ${name} adicionado!`, 'success');
-            });
-        }
-
-        function openShiftsModal() {
-            renderExistingShifts();
-            document.getElementById('shiftsModal').style.display = 'flex';
-        }
-
-        function renderExistingShifts() {
-            const container = document.getElementById('existingShifts');
-            const shifts = db.getShifts();
-            
-            container.innerHTML = '';
-            
-            if (shifts.length === 0) {
-                container.innerHTML = '<p style="color: #999; font-style: italic; text-align: center; padding: 10px;">Nenhum turno cadastrado.</p>';
-                return;
-            }
-            
-            shifts.forEach(shift => {
-                const item = document.createElement('div');
-                item.className = 'existing-item';
-                item.innerHTML = `
-                    <div>
-                        <strong>${shift.name}</strong><br>
-                        <small>${shift.time}</small>
-                    </div>
-                    ${shift.name !== 'Folga' ? `<button class="remove-item" data-id="${shift.id}"><i class="fas fa-trash"></i></button>` : ''}
-                `;
-                
-                if (shift.name !== 'Folga') {
-                    const removeBtn = item.querySelector('.remove-item');
-                    removeBtn.addEventListener('click', () => {
-                        if (confirm(`Remover o turno "${shift.name}"?`)) {
-                            db.removeShift(shift.id);
-                            renderExistingShifts();
-                            renderLegend();
-                            renderSchedule();
-                            showNotification('Turno removido!', 'success');
-                        }
-                    });
-                }
-                
-                container.appendChild(item);
-            });
-        }
-
-        function createSectorsModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'sectorsModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Gerenciar Setores</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="form-group">
-                        <h4>Setores Existentes</h4>
-                        <div id="existingSectors">
-                            <!-- Setores serão listados aqui -->
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <h4>Adicionar Novo Setor</h4>
-                        <div class="sector-form">
-                            <input type="text" id="newSectorName" class="form-control" placeholder="Nome do Setor">
-                            <button class="btn btn-primary" id="addSectorBtn">Adicionar Setor</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de setores
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#addSectorBtn').addEventListener('click', function() {
-                const name = document.getElementById('newSectorName').value.trim();
-                
-                if (!name) {
-                    showNotification('Digite o nome do setor!', 'warning');
-                    return;
-                }
-                
-                const newSector = { name };
-                db.addSector(newSector);
-                
-                document.getElementById('newSectorName').value = '';
-                
-                renderExistingSectors();
-                renderSectorSchedule();
-                
-                showNotification(`Setor ${name} adicionado!`, 'success');
-            });
-        }
-
-        function openSectorsModal() {
-            renderExistingSectors();
-            document.getElementById('sectorsModal').style.display = 'flex';
-        }
-
-        function renderExistingSectors() {
-            const container = document.getElementById('existingSectors');
-            const sectors = db.getSectors();
-            
-            container.innerHTML = '';
-            
-            if (sectors.length === 0) {
-                container.innerHTML = '<p style="color: #999; font-style: italic; text-align: center; padding: 10px;">Nenhum setor cadastrado.</p>';
-                return;
-            }
-            
-            sectors.forEach(sector => {
-                const item = document.createElement('div');
-                item.className = 'existing-item';
-                item.innerHTML = `
-                    <div><strong>${sector.name}</strong></div>
-                    <button class="remove-item" data-id="${sector.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-                
-                const removeBtn = item.querySelector('.remove-item');
-                removeBtn.addEventListener('click', () => {
-                    if (confirm(`Remover o setor "${sector.name}"?`)) {
-                        db.removeSector(sector.id);
-                        renderExistingSectors();
-                        renderSectorSchedule();
-                        showNotification('Setor removido!', 'success');
-                    }
-                });
-                
-                container.appendChild(item);
-            });
-        }
-
-        function createScheduleModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'scheduleModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="scheduleModalTitle">Definir Escala</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="form-group">
-                        <label id="scheduleInfo"></label>
-                        <div class="shift-options" id="shiftOptions">
-                            <!-- Opções serão geradas dinamicamente -->
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-success" id="saveShift" style="width: 100%;">
-                            <i class="fas fa-check"></i> Confirmar
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de escala
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#saveShift').addEventListener('click', saveShift);
-        }
-
-        function openScheduleModal(employeeId, dayIndex, employeeName, date) {
-            currentEditing = { employeeId, dayIndex, type: 'shift' };
-            
-            const dayName = db.formatDayName(date);
-            const dateStr = db.formatDate(date);
-            
-            document.getElementById('scheduleInfo').textContent = 
-                `Definir turno para ${employeeName} em ${dayName} (${dateStr})`;
-            
-            // Limpar opções anteriores
-            const shiftOptions = document.getElementById('shiftOptions');
-            shiftOptions.innerHTML = '';
-            
-            // Adicionar turnos disponíveis
-            const shifts = db.getShifts();
-            shifts.forEach(shift => {
-                const option = document.createElement('div');
-                option.className = 'shift-option';
-                option.dataset.shift = shift.id;
-                option.innerHTML = `
-                    <div class="shift-label">${shift.name}</div>
-                    <div class="shift-time">${shift.time}</div>
-                `;
-                option.style.borderLeft = `4px solid ${shift.color}`;
-                option.style.backgroundColor = `${shift.color}20`;
-                option.addEventListener('click', function() {
-                    document.querySelectorAll('.shift-option').forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                });
-                shiftOptions.appendChild(option);
-            });
-            
-            // Selecionar opção atual
-            const weekKey = db.getWeekKey(currentWeekStart);
-            const schedule = db.getSchedule();
-            const currentShiftId = schedule[weekKey] && schedule[weekKey][employeeId] && schedule[weekKey][employeeId][dayIndex];
-            
-            if (currentShiftId) {
-                const currentOption = document.querySelector(`.shift-option[data-shift="${currentShiftId}"]`);
-                if (currentOption) currentOption.classList.add('selected');
-            }
-            
-            document.getElementById('scheduleModal').style.display = 'flex';
-        }
-
-        function saveShift() {
-            const selectedOption = document.querySelector('.shift-option.selected');
-            if (!selectedOption) {
-                showNotification('Selecione um turno!', 'warning');
-                return;
-            }
-            
-            const shiftId = parseInt(selectedOption.dataset.shift);
-            const { employeeId, dayIndex } = currentEditing;
-            const weekKey = db.getWeekKey(currentWeekStart);
-            let schedule = db.getSchedule();
-            
-            // Inicializar estrutura se não existir
-            if (!schedule[weekKey]) schedule[weekKey] = {};
-            if (!schedule[weekKey][employeeId]) schedule[weekKey][employeeId] = {};
-            
-            // Salvar o turno
-            schedule[weekKey][employeeId][dayIndex] = shiftId;
-            db.saveSchedule(schedule);
-            
-            // Atualizar exibição
-            renderSchedule();
-            document.getElementById('scheduleModal').style.display = 'none';
-            
-            showNotification('Escala definida!', 'success');
-        }
-
-        function createSectorModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'sectorModal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Definir Setor</h3>
-                        <button class="close-modal">&times;</button>
-                    </div>
-                    <div class="form-group">
-                        <label id="sectorInfo"></label>
-                        <select id="sectorSelect" class="form-control">
-                            <!-- Opções serão preenchidas dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-success" id="saveSector" style="width: 100%;">
-                            <i class="fas fa-check"></i> Confirmar
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Eventos do modal de setor
-            modal.querySelector('.close-modal').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.querySelector('#saveSector').addEventListener('click', saveSector);
-        }
-
-        function openSectorModal(employeeId, dayIndex, employeeName, date) {
-            currentEditing = { employeeId, dayIndex, type: 'sector' };
-            
-            const dayName = db.formatDayName(date);
-            const dateStr = db.formatDate(date);
-            
-            document.getElementById('sectorInfo').textContent = 
-                `Definir setor para ${employeeName} em ${dayName} (${dateStr})`;
-            
-            // Preencher select com setores
-            const sectorSelect = document.getElementById('sectorSelect');
-            sectorSelect.innerHTML = '<option value="">-- Selecione um setor --</option>';
-            
-            const sectors = db.getSectors();
-            sectors.forEach(sector => {
-                const option = document.createElement('option');
-                option.value = sector.id;
-                option.textContent = sector.name;
-                sectorSelect.appendChild(option);
-            });
-            
-            // Selecionar setor atual se existir
-            const weekKey = db.getWeekKey(currentWeekStart);
-            const schedule = db.getSectorSchedule();
-            const currentSectorId = schedule[weekKey] && schedule[weekKey][employeeId] && schedule[weekKey][employeeId][dayIndex];
-            
-            if (currentSectorId) {
-                sectorSelect.value = currentSectorId;
-            }
-            
-            document.getElementById('sectorModal').style.display = 'flex';
-        }
-
-        function saveSector() {
-            const sectorId = document.getElementById('sectorSelect').value;
-            const { employeeId, dayIndex } = currentEditing;
-            const weekKey = db.getWeekKey(currentWeekStart);
-            let schedule = db.getSectorSchedule();
-            
-            if (!sectorId) {
-                showNotification('Selecione um setor!', 'warning');
-                return;
-            }
-            
-            // Inicializar estrutura se não existir
-            if (!schedule[weekKey]) schedule[weekKey] = {};
-            if (!schedule[weekKey][employeeId]) schedule[weekKey][employeeId] = {};
-            
-            // Salvar o setor
-            schedule[weekKey][employeeId][dayIndex] = parseInt(sectorId);
-            db.saveSectorSchedule(schedule);
-            
-            // Atualizar exibição
-            renderSectorSchedule();
-            document.getElementById('sectorModal').style.display = 'none';
-            
-            showNotification('Setor definido!', 'success');
-        }
-
-        // ========== NOTIFICAÇÕES ==========
-        function showNotification(message, type) {
-            // Remover notificações anteriores
-            const existing = document.querySelector('.notification');
-            if (existing) existing.remove();
-            
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            
-            if (type === 'success') {
-                notification.style.backgroundColor = 'var(--success-color)';
-            } else if (type === 'warning') {
-                notification.style.backgroundColor = 'var(--warning-color)';
-            } else if (type === 'danger') {
-                notification.style.backgroundColor = 'var(--danger-color)';
-            } else {
-                notification.style.backgroundColor = 'var(--primary-color)';
-            }
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-out';
+                errorMessage.style.display = 'block';
                 setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // ========== FUNÇÕES ADICIONAIS PARA MOBILE ==========
-        // Fechar modais ao tocar fora (para mobile)
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.style.display = 'none';
+                    errorMessage.style.display = 'none';
+                }, 3000);
             }
         });
 
-        // Suporte a gestos de swipe para navegação
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        document.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            const swipeDistance = touchEndX - touchStartX;
-            
-            if (Math.abs(swipeDistance) > swipeThreshold) {
-                if (swipeDistance > 0) {
-                    // Swipe para direita - semana anterior
-                    if (currentTab === 'scale') {
-                        navigateWeek(-7);
-                    } else {
-                        navigateSectorWeek(-7);
-                    }
-                } else {
-                    // Swipe para esquerda - próxima semana
-                    if (currentTab === 'scale') {
-                        navigateWeek(7);
-                    } else {
-                        navigateSectorWeek(7);
-                    }
-                }
-            }
-        }
-
-        // Melhorar scroll em mobile
-        document.querySelectorAll('.schedule-container, .sector-container').forEach(container => {
-            container.addEventListener('touchmove', function(e) {
-                e.stopPropagation();
-            }, { passive: true });
-        });
-
-        console.log('Aplicação inicializada com sucesso!');
+        // Foco automático no campo de usuário
+        document.getElementById('username').focus();
     </script>
 </body>
 </html>
