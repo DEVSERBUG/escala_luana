@@ -9,6 +9,56 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     initApp();
 });
+// No início do initApp(), após checkAuth():
+function initApp() {
+    checkAuth();
+    
+    // Mostrar status de conexão
+    showConnectionStatus();
+    
+    renderEmployees();
+    renderSchedule();
+    renderSectorSchedule();
+    updateWeekDisplay();
+    updateSectorWeekDisplay();
+    renderLegend();
+    setupEventListeners();
+    
+    showNotification('Sistema carregado com sucesso!', 'success');
+    
+    disableProblematicSwipe();
+}
+
+// Adicione esta função:
+function showConnectionStatus() {
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'connectionStatus';
+    statusDiv.style.cssText = `
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    `;
+    
+    if (db.isOnline) {
+        statusDiv.innerHTML = '<i class="fas fa-wifi" style="color: #27ae60;"></i> Online';
+        statusDiv.style.backgroundColor = '#27ae60';
+        statusDiv.style.color = 'white';
+    } else {
+        statusDiv.innerHTML = '<i class="fas fa-wifi-slash" style="color: #e74c3c;"></i> Offline (usando dados locais)';
+        statusDiv.style.backgroundColor = '#e74c3c';
+        statusDiv.style.color = 'white';
+    }
+    
+    document.body.appendChild(statusDiv);
+}
 
 function checkAuth() {
     const userData = sessionStorage.getItem('user');
