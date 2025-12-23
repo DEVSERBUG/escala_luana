@@ -829,6 +829,260 @@ td:first-child {
         margin: 20px 0;
     }
 }
+/* Painel de Status Firebase */
+.status-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    max-height: 500px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 2001;
+    display: none;
+    flex-direction: column;
+    border: 1px solid #ddd;
+}
+
+.status-panel.show {
+    display: flex;
+}
+
+.status-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-status {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-content {
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.status-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.status-label {
+    font-weight: 600;
+    color: #666;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.status-value {
+    color: #333;
+    font-weight: 500;
+    display: block;
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.status-value.online {
+    color: var(--success-color);
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.status-value.offline {
+    color: var(--danger-color);
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.status-value.syncing {
+    color: var(--warning-color);
+    background-color: rgba(243, 156, 18, 0.1);
+}
+
+.logs-container {
+    max-height: 150px;
+    overflow-y: auto;
+    background: #1a1a1a;
+    color: #f0f0f0;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+
+.log-entry {
+    padding: 4px 0;
+    border-bottom: 1px solid #333;
+    display: flex;
+    gap: 10px;
+}
+
+.log-time {
+    color: #aaa;
+    min-width: 70px;
+}
+
+.log-message {
+    color: #fff;
+    flex: 1;
+}
+
+.log-success {
+    color: #4CAF50;
+}
+
+.log-warning {
+    color: #FF9800;
+}
+
+.log-error {
+    color: #F44336;
+}
+
+.log-info {
+    color: #2196F3;
+}
+
+.status-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.status-actions .btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+/* Botão flutuante */
+.floating-status-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+}
+
+.floating-status-btn:hover {
+    transform: scale(1.1);
+    background: var(--secondary-color);
+}
+
+.floating-status-btn.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+/* Notificação toast */
+.firebase-toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    box-shadow: var(--box-shadow);
+    animation: slideInRight 0.3s ease-out;
+    max-width: 300px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.firebase-toast.success {
+    background-color: rgba(39, 174, 96, 0.9);
+}
+
+.firebase-toast.error {
+    background-color: rgba(231, 76, 60, 0.9);
+}
+
+.firebase-toast.warning {
+    background-color: rgba(243, 156, 18, 0.9);
+}
+
+.firebase-toast.info {
+    background-color: rgba(52, 152, 219, 0.9);
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Indicador de sincronização na tabela */
+.sync-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.sync-indicator.synced {
+    background-color: var(--success-color);
+    animation: pulse 2s infinite;
+}
+
+.sync-indicator.pending {
+    background-color: var(--warning-color);
+}
+
+.sync-indicator.error {
+    background-color: var(--danger-color);
+}
 
 /* Status de sincronização */
 .sync-status {

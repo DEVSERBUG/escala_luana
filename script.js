@@ -1065,5 +1065,111 @@ function showNotification(message, type) {
         }, 300);
     }, 3000);
 }
+// ========== SISTEMA DE MONITORAMENTO FIREBASE ==========
+function setupFirebaseMonitoring() {
+    // Botão flutuante para abrir painel de status
+    const floatingBtn = document.getElementById('floatingStatusBtn');
+    const statusPanel = document.getElementById('statusPanel');
+    const closeBtn = document.querySelector('.btn-close-status');
+    
+    if (floatingBtn && statusPanel) {
+        floatingBtn.addEventListener('click', () => {
+            statusPanel.classList.toggle('show');
+            db.updateLogsUI();
+            db.updateStatusUI();
+        });
+        
+        closeBtn.addEventListener('click', () => {
+            statusPanel.classList.remove('show');
+        });
+        
+        // Botões do painel
+        document.getElementById('refreshStatus')?.addEventListener('click', () => {
+            db.updateStatusUI();
+            db.log('Status atualizado manualmente', 'info');
+        });
+        
+        document.getElementById('clearLogs')?.addEventListener('click', () => {
+            db.logs = [];
+            db.updateLogsUI();
+            db.log('Logs limpos', 'info');
+        });
+        
+        document.getElementById('forceSync')?.addEventListener('click', () => {
+            db.forceSyncAll();
+        });
+        
+        // Teste de conexão automático a cada 30 segundos
+        setInterval(() => {
+            if (db.isOnline) {
+                floatingBtn.classList.add('pulse');
+                setTimeout(() => floatingBtn.classList.remove('pulse'), 1000);
+            }
+        }, 30000);
+    }
+}
+
+// ========== TESTE RÁPIDO DE FIREBASE ==========
+async function testFirebaseConnection() {
+    const result = await db.testConnection();
+    
+    if (result) {
+        // Mostrar informações detalhadas no console
+        console.group('🔥 FIREBASE CONFIGURAÇÃO');
+        console.log('✅ Conexão estabelecida com sucesso!');
+        console.log('📊 Projeto:', db.firebaseConfig.projectId);
+        console.log('🌐 Domínio:', db.firebaseConfig.authDomain);
+        console.log('🔄 Status:', db.isOnline ? 'Online' : 'Offline');
+        console.log('📁 Coleções disponíveis:');
+        
+        // Listar coleções (opcional)
+        try {
+            const collections = await db.db.listCollections();
+            console.log('   - employees');
+            console.log('   - shifts'); 
+            console.log('   - sectors');
+            console.log('   - schedule');
+            console.log('   - sectorSchedule');
+            console.log(`   Total: ${collections.length} coleções`);
+        } catch (e) {
+            console.log('   Não foi possível listar coleções');
+        }
+        
+        console.groupEnd();
+        
+        // Mostrar toast de sucesso
+        showNotification('✅ Firebase conectado com sucesso!', 'success');
+        
+    } else {
+        console.error('❌ Falha na conexão com Firebase');
+        showNotification('❌ Erro na conexão com Firebase', 'danger');
+    }
+}
+
+// No initApp(), adicione:
+function initApp() {
+    checkAuth();
+    
+    renderEmployees();
+    renderSchedule();
+    renderSectorSchedule();
+    updateWeekDisplay();
+    updateSectorWeekDisplay();
+    renderLegend();
+    setupEventListeners();
+    
+    // Inicializar monitoramento Firebase
+    setupFirebaseMonitoring();
+    
+    // Testar conexão após 2 segundos
+    setTimeout(() => {
+        if (!db.isViewMode) {
+            testFirebaseConnection();
+        }
+    }, 2000);
+    
+    showNotification('Sistema carregado!', 'success');
+    disableProblematicSwipe();
+}
 
 console.log('Script carregado com sucesso!');
