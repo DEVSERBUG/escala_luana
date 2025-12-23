@@ -140,8 +140,8 @@ h1 i {
     margin-top: 5px;
 }
 
-.dropdown:hover .dropdown-menu {
-    display: block;
+.dropdown-menu.show {
+    display: block !important;
 }
 
 .dropdown-menu a {
@@ -154,6 +154,7 @@ h1 i {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 .dropdown-menu a:hover {
@@ -762,6 +763,71 @@ td:first-child {
 .view-mode .btn:not(.btn-logout):hover {
     transform: none;
     background-color: inherit;
+}
+
+/* Estilo para impressão */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .top-bar,
+    .header-controls,
+    .controls,
+    .week-navigation .btn,
+    .info-panels,
+    .tab-btn {
+        display: none !important;
+    }
+    
+    .container,
+    .container * {
+        visibility: visible;
+    }
+    
+    .container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+    }
+    
+    .schedule-container,
+    .sector-container {
+        max-height: none;
+        box-shadow: none;
+        overflow: visible;
+    }
+    
+    table {
+        min-width: 100%;
+        border: 2px solid #000;
+    }
+    
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 8px;
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    th {
+        background-color: #f0f0f0 !important;
+        color: #000 !important;
+    }
+    
+    .tab-content.active {
+        display: block !important;
+        page-break-after: always;
+    }
+    
+    .week-display {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px 0;
+    }
 }
 
 /* Status de sincronização */

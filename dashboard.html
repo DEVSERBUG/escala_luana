@@ -25,10 +25,10 @@
             <h1><i class="fas fa-calendar-alt"></i> Controle de Escalas</h1>
             <div class="header-controls">
                 <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle">
+                    <button class="btn btn-primary dropdown-toggle" id="dropdownToggle">
                         <i class="fas fa-cog"></i> Gerenciar
                     </button>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu" id="dropdownMenu">
                         <a href="#" id="addEmployeeBtn"><i class="fas fa-user-plus"></i> Novo Colaborador</a>
                         <a href="#" id="manageShiftsBtn"><i class="fas fa-clock"></i> Gerenciar Turnos</a>
                         <a href="#" id="removeEmployeeBtn"><i class="fas fa-user-minus"></i> Remover Colaborador</a>
@@ -72,7 +72,7 @@
                 </button>
             </div>
 
-            <div class="schedule-container" id="scrollContainer">
+            <div class="schedule-container">
                 <table id="scheduleTable">
                     <thead>
                         <tr id="scheduleHeader">
@@ -135,8 +135,140 @@
         </div>
     </div>
 
-    <!-- Todos os modais serão criados dinamicamente via JavaScript -->
-    
+    <!-- Modais FIXOS (não dinâmicos) -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Colaborador</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label for="employeeName">Nome do Colaborador *</label>
+                    <input type="text" id="employeeName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeRole">Cargo/Função *</label>
+                    <input type="text" id="employeeRole" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Salvar Colaborador
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="removeEmployeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Remover Colaborador</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Selecione o colaborador:</label>
+                <select id="employeeToRemove" class="form-control">
+                    <!-- Opções serão preenchidas dinamicamente -->
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-danger" id="confirmRemove" style="width: 100%;">
+                    <i class="fas fa-trash"></i> Remover Colaborador
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="shiftsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gerenciar Turnos</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <h4>Turnos Existentes</h4>
+                <div id="existingShifts">
+                    <!-- Turnos serão listados aqui -->
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Adicionar Novo Turno</h4>
+                <div class="shift-form">
+                    <input type="text" id="newShiftName" class="form-control" placeholder="Nome do Turno">
+                    <input type="text" id="newShiftTime" class="form-control" placeholder="Horário (ex: 08:00-12:00)">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="font-size: 0.9rem;">Cor:</label>
+                        <input type="color" id="newShiftColor" value="#3498db" style="flex: 1;">
+                    </div>
+                    <button class="btn btn-primary" id="addShiftBtn">Adicionar Turno</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sectorsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Gerenciar Setores</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <h4>Setores Existentes</h4>
+                <div id="existingSectors">
+                    <!-- Setores serão listados aqui -->
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Adicionar Novo Setor</h4>
+                <div class="sector-form">
+                    <input type="text" id="newSectorName" class="form-control" placeholder="Nome do Setor">
+                    <button class="btn btn-primary" id="addSectorBtn">Adicionar Setor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="scheduleModalTitle">Definir Escala</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label id="scheduleInfo"></label>
+                <div class="shift-options" id="shiftOptions">
+                    <!-- Opções serão geradas dinamicamente -->
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" id="saveShift" style="width: 100%;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sectorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Definir Setor</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label id="sectorInfo"></label>
+                <select id="sectorSelect" class="form-control">
+                    <!-- Opções serão preenchidas dinamicamente -->
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" id="saveSector" style="width: 100%;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Importar arquivo (hidden) -->
     <input type="file" id="importFile" accept=".json" style="display: none;">
     

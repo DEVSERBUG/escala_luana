@@ -28,10 +28,15 @@ function checkAuth() {
     // Aplicar modo de visualização se necessário
     if (isViewMode) {
         document.body.classList.add('view-mode');
+        console.log('Modo visualização ativado');
+    } else {
+        console.log('Modo administrador ativado');
     }
 }
 
 function initApp() {
+    console.log('Inicializando aplicação...');
+    
     renderEmployees();
     renderSchedule();
     renderSectorSchedule();
@@ -39,66 +44,82 @@ function initApp() {
     updateSectorWeekDisplay();
     renderLegend();
     setupEventListeners();
-    createModals();
     
-    showNotification('Sistema carregado!', 'success');
+    showNotification('Sistema carregado com sucesso!', 'success');
     
-    // Desativar swipe no container da tabela
-    disableSwipeNavigation();
+    // Desativar swipe problemático
+    disableProblematicSwipe();
+    
+    console.log('Aplicação inicializada');
 }
 
-function disableSwipeNavigation() {
-    const scrollContainer = document.getElementById('scrollContainer');
-    if (scrollContainer) {
-        scrollContainer.addEventListener('touchmove', function(e) {
-            // Permitir apenas scroll vertical/horizontal, não swipe para mudar semana
+function disableProblematicSwipe() {
+    // Desativar eventos de swipe problemáticos
+    document.addEventListener('touchstart', function(e) {
+        // Marcar início, mas não fazer nada
+        this.touchStart = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY,
+            time: Date.now()
+        };
+    }, { passive: true });
+    
+    document.addEventListener('touchend', function(e) {
+        if (!this.touchStart) return;
+        
+        const touchEnd = {
+            x: e.changedTouches[0].clientX,
+            y: e.changedTouches[0].clientY,
+            time: Date.now()
+        };
+        
+        const deltaX = Math.abs(touchEnd.x - this.touchStart.x);
+        const deltaY = Math.abs(touchEnd.y - this.touchStart.y);
+        const deltaTime = touchEnd.time - this.touchStart.time;
+        
+        // Só considerar swipe se for muito rápido e horizontal
+        if (deltaTime < 300 && deltaX > 50 && deltaY < 30) {
+            // Bloquear navegação por swipe
+            e.preventDefault();
             e.stopPropagation();
-        }, { passive: false });
+        }
         
-        // Desativar gestos de swipe na tabela
-        scrollContainer.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 1) {
-                // Marcar início do toque, mas não fazer nada
-                this.touchStartX = e.touches[0].clientX;
-                this.touchStartY = e.touches[0].clientY;
-            }
-        }, { passive: true });
-        
-        scrollContainer.addEventListener('touchend', function(e) {
-            if (this.touchStartX && this.touchStartY && e.changedTouches.length === 1) {
-                const touchEndX = e.changedTouches[0].clientX;
-                const touchEndY = e.changedTouches[0].clientY;
-                
-                const deltaX = Math.abs(touchEndX - this.touchStartX);
-                const deltaY = Math.abs(touchEndY - this.touchStartY);
-                
-                // Só considerar como swipe se for horizontal e longo o suficiente
-                // E o movimento vertical for pequeno (não é scroll)
-                if (deltaX > 100 && deltaY < 50) {
-                    // Ignorar swipe na tabela
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }
-            
-            this.touchStartX = null;
-            this.touchStartY = null;
-        }, { passive: false });
-    }
+        this.touchStart = null;
+    }, { passive: false });
 }
 
 function setupEventListeners() {
+    console.log('Configurando eventos...');
+    
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
         sessionStorage.removeItem('user');
         window.location.href = 'index.html';
     });
 
+    // Dropdown menu - CORRIGIDO
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    if (dropdownToggle && dropdownMenu) {
+        dropdownToggle.addEventListener('click', function(e) {
+            if (isViewMode) return;
+            
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+        
+        // Fechar ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    }
+
     // Tabs
     document.querySelectorAll('.tab-btn').forEach(tab => {
         tab.addEventListener('click', function() {
-            if (isViewMode) return;
-            
             document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
@@ -122,7 +143,7 @@ function setupEventListeners() {
     document.getElementById('todayBtn').addEventListener('click', goToToday);
     document.getElementById('copyPrevWeek').addEventListener('click', copyPreviousWeek);
     document.getElementById('saveSchedule').addEventListener('click', () => {
-        showNotification('Escala salva!', 'success');
+        showNotification('Escala salva localmente!', 'success');
     });
 
     // Navegação entre semanas - Setores
@@ -140,9 +161,10 @@ function setupEventListeners() {
         showNotification('Escala de setores salva!', 'success');
     });
 
-    // Imprimir
-    document.getElementById('printSchedule').addEventListener('click', () => {
-        window.print();
+    // Imprimir - MELHORADO
+    document.getElementById('printSchedule').addEventListener('click', function() {
+        if (isViewMode) return;
+        printSchedule();
     });
 
     // Exportar/Importar
@@ -169,7 +191,6 @@ function setupEventListeners() {
                 const success = database.importData(event.target.result);
                 if (success) {
                     location.reload();
-                    showNotification('Dados importados com sucesso!', 'success');
                 } else {
                     showNotification('Erro ao importar dados!', 'danger');
                 }
@@ -179,74 +200,60 @@ function setupEventListeners() {
         reader.readAsText(file);
     });
 
-    // Menu dropdown para mobile - corrigido
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-    
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function(e) {
-            if (isViewMode) return;
-            
-            if (window.innerWidth <= 768) {
-                e.preventDefault();
-                e.stopPropagation();
-                const isVisible = dropdownMenu.style.display === 'block';
-                dropdownMenu.style.display = isVisible ? 'none' : 'block';
-                
-                // Reposicionar se estiver saindo da tela
-                setTimeout(() => {
-                    const rect = dropdownMenu.getBoundingClientRect();
-                    if (rect.right > window.innerWidth) {
-                        dropdownMenu.style.left = 'auto';
-                        dropdownMenu.style.right = '0';
-                    }
-                }, 10);
-            }
-        });
-        
-        // Fechar ao clicar fora
-        document.addEventListener('click', function(e) {
-            if (window.innerWidth <= 768 && !dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.display = 'none';
-            }
-        });
-        
-        // Fechar ao rolar (mobile)
-        window.addEventListener('scroll', function() {
-            if (window.innerWidth <= 768) {
-                dropdownMenu.style.display = 'none';
-            }
-        }, true);
-    }
-}
-
-function createModals() {
-    // Criar todos os modais dinamicamente
-    createEmployeeModal();
-    createRemoveEmployeeModal();
-    createShiftsModal();
-    createSectorsModal();
-    createScheduleModal();
-    createSectorModal();
-    
-    // Vincular eventos dos modais
-    bindModalEvents();
-}
-
-function bindModalEvents() {
-    if (isViewMode) return;
-    
-    // Modal de colaborador
+    // Menu Gerenciar - CORRIGIDO E FUNCIONAL
     document.getElementById('addEmployeeBtn').addEventListener('click', openEmployeeModal);
-    
-    // Modal de remover colaborador
     document.getElementById('removeEmployeeBtn').addEventListener('click', openRemoveEmployeeModal);
-    
-    // Modal de turnos
     document.getElementById('manageShiftsBtn').addEventListener('click', openShiftsModal);
-    
-    // Modal de setores
     document.getElementById('manageSectorsBtn').addEventListener('click', openSectorsModal);
+
+    // Modais - Fechar com botão X
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
+    });
+
+    // Modal de colaborador - Submit
+    document.getElementById('employeeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveEmployee();
+    });
+
+    // Modal de remover colaborador
+    document.getElementById('confirmRemove').addEventListener('click', removeEmployee);
+
+    // Modal de turnos
+    document.getElementById('addShiftBtn').addEventListener('click', addShift);
+
+    // Modal de setores
+    document.getElementById('addSectorBtn').addEventListener('click', addSector);
+
+    // Modal de escala
+    document.getElementById('saveShift').addEventListener('click', saveShift);
+
+    // Modal de setor
+    document.getElementById('saveSector').addEventListener('click', saveSector);
+
+    // Fechar modais ao clicar fora
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Fechar modais com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            if (dropdownMenu) dropdownMenu.classList.remove('show');
+        }
+    });
+
+    console.log('Eventos configurados com sucesso');
 }
 
 // ========== FUNÇÕES DE RENDERIZAÇÃO ==========
@@ -530,72 +537,210 @@ function copyPreviousWeek() {
 }
 
 // ========== FUNÇÕES DOS MODAIS ==========
-// (As funções dos modais são similares às anteriores, mas com verificações de view-mode)
-
-function createEmployeeModal() {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'employeeModal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Adicionar Colaborador</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="employeeForm">
-                <div class="form-group">
-                    <label for="employeeName">Nome do Colaborador *</label>
-                    <input type="text" id="employeeName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="employeeRole">Cargo/Função *</label>
-                    <input type="text" id="employeeRole" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-save"></i> Salvar Colaborador
-                    </button>
-                </div>
-            </form>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    modal.querySelector('#employeeForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('employeeName').value.trim();
-        const role = document.getElementById('employeeRole').value.trim();
-        
-        if (!name || !role) {
-            showNotification('Preencha todos os campos!', 'warning');
-            return;
-        }
-        
-        const newEmployee = { name, role };
-        database.addEmployee(newEmployee);
-        
-        renderEmployees();
-        renderSchedule();
-        renderSectorSchedule();
-        modal.style.display = 'none';
-        this.reset();
-        
-        showNotification(`Colaborador ${name} adicionado!`, 'success');
-    });
-}
-
 function openEmployeeModal() {
     if (isViewMode) return;
+    
+    document.getElementById('dropdownMenu').classList.remove('show');
     document.getElementById('employeeModal').style.display = 'flex';
     document.getElementById('employeeName').focus();
 }
 
-// ... (outras funções de modal similares, com verificação de isViewMode)
+function saveEmployee() {
+    const name = document.getElementById('employeeName').value.trim();
+    const role = document.getElementById('employeeRole').value.trim();
+    
+    if (!name || !role) {
+        showNotification('Preencha todos os campos!', 'warning');
+        return;
+    }
+    
+    const newEmployee = { name, role };
+    database.addEmployee(newEmployee);
+    
+    renderEmployees();
+    renderSchedule();
+    renderSectorSchedule();
+    document.getElementById('employeeModal').style.display = 'none';
+    document.getElementById('employeeForm').reset();
+    
+    showNotification(`Colaborador ${name} adicionado!`, 'success');
+}
+
+function openRemoveEmployeeModal() {
+    if (isViewMode) return;
+    
+    document.getElementById('dropdownMenu').classList.remove('show');
+    
+    const select = document.getElementById('employeeToRemove');
+    const employees = database.getEmployees();
+    
+    select.innerHTML = '';
+    employees.forEach(employee => {
+        const option = document.createElement('option');
+        option.value = employee.id;
+        option.textContent = `${employee.name} - ${employee.role}`;
+        select.appendChild(option);
+    });
+    
+    document.getElementById('removeEmployeeModal').style.display = 'flex';
+}
+
+function removeEmployee() {
+    const select = document.getElementById('employeeToRemove');
+    const employeeId = parseInt(select.value);
+    
+    if (!employeeId) {
+        showNotification('Selecione um colaborador!', 'warning');
+        return;
+    }
+    
+    const employee = database.getEmployees().find(e => e.id === employeeId);
+    
+    if (confirm(`Tem certeza que deseja remover ${employee.name}?`)) {
+        database.removeEmployee(employeeId);
+        
+        renderEmployees();
+        renderSchedule();
+        renderSectorSchedule();
+        document.getElementById('removeEmployeeModal').style.display = 'none';
+        
+        showNotification('Colaborador removido!', 'success');
+    }
+}
+
+function openShiftsModal() {
+    if (isViewMode) return;
+    
+    document.getElementById('dropdownMenu').classList.remove('show');
+    renderExistingShifts();
+    document.getElementById('shiftsModal').style.display = 'flex';
+}
+
+function renderExistingShifts() {
+    const container = document.getElementById('existingShifts');
+    const shifts = database.getShifts();
+    
+    container.innerHTML = '';
+    
+    if (shifts.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-style: italic; text-align: center; padding: 10px;">Nenhum turno cadastrado.</p>';
+        return;
+    }
+    
+    shifts.forEach(shift => {
+        const item = document.createElement('div');
+        item.className = 'existing-item';
+        item.innerHTML = `
+            <div>
+                <strong>${shift.name}</strong><br>
+                <small>${shift.time}</small>
+            </div>
+            ${shift.name !== 'Folga' ? `<button class="remove-item" data-id="${shift.id}"><i class="fas fa-trash"></i></button>` : ''}
+        `;
+        
+        if (shift.name !== 'Folga') {
+            const removeBtn = item.querySelector('.remove-item');
+            removeBtn.addEventListener('click', () => {
+                if (confirm(`Remover o turno "${shift.name}"?`)) {
+                    database.removeShift(shift.id);
+                    renderExistingShifts();
+                    renderLegend();
+                    renderSchedule();
+                    showNotification('Turno removido!', 'success');
+                }
+            });
+        }
+        
+        container.appendChild(item);
+    });
+}
+
+function addShift() {
+    const name = document.getElementById('newShiftName').value.trim();
+    const time = document.getElementById('newShiftTime').value.trim();
+    const color = document.getElementById('newShiftColor').value;
+    
+    if (!name || !time) {
+        showNotification('Preencha nome e horário!', 'warning');
+        return;
+    }
+    
+    const newShift = { name, time, color };
+    database.addShift(newShift);
+    
+    document.getElementById('newShiftName').value = '';
+    document.getElementById('newShiftTime').value = '';
+    
+    renderExistingShifts();
+    renderLegend();
+    renderSchedule();
+    
+    showNotification(`Turno ${name} adicionado!`, 'success');
+}
+
+function openSectorsModal() {
+    if (isViewMode) return;
+    
+    document.getElementById('dropdownMenu').classList.remove('show');
+    renderExistingSectors();
+    document.getElementById('sectorsModal').style.display = 'flex';
+}
+
+function renderExistingSectors() {
+    const container = document.getElementById('existingSectors');
+    const sectors = database.getSectors();
+    
+    container.innerHTML = '';
+    
+    if (sectors.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-style: italic; text-align: center; padding: 10px;">Nenhum setor cadastrado.</p>';
+        return;
+    }
+    
+    sectors.forEach(sector => {
+        const item = document.createElement('div');
+        item.className = 'existing-item';
+        item.innerHTML = `
+            <div><strong>${sector.name}</strong></div>
+            <button class="remove-item" data-id="${sector.id}">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        
+        const removeBtn = item.querySelector('.remove-item');
+        removeBtn.addEventListener('click', () => {
+            if (confirm(`Remover o setor "${sector.name}"?`)) {
+                database.removeSector(sector.id);
+                renderExistingSectors();
+                renderSectorSchedule();
+                renderLegend();
+                showNotification('Setor removido!', 'success');
+            }
+        });
+        
+        container.appendChild(item);
+    });
+}
+
+function addSector() {
+    const name = document.getElementById('newSectorName').value.trim();
+    
+    if (!name) {
+        showNotification('Digite o nome do setor!', 'warning');
+        return;
+    }
+    
+    const newSector = { name };
+    database.addSector(newSector);
+    
+    document.getElementById('newSectorName').value = '';
+    
+    renderExistingSectors();
+    renderSectorSchedule();
+    renderLegend();
+    
+    showNotification(`Setor ${name} adicionado!`, 'success');
+}
 
 function openScheduleModal(employeeId, dayIndex, employeeName, date) {
     if (isViewMode) return;
@@ -641,6 +786,205 @@ function openScheduleModal(employeeId, dayIndex, employeeName, date) {
     document.getElementById('scheduleModal').style.display = 'flex';
 }
 
+function saveShift() {
+    const selectedOption = document.querySelector('.shift-option.selected');
+    if (!selectedOption) {
+        showNotification('Selecione um turno!', 'warning');
+        return;
+    }
+    
+    const shiftId = parseInt(selectedOption.dataset.shift);
+    const { employeeId, dayIndex } = currentEditing;
+    const weekKey = database.getWeekKey(currentWeekStart);
+    let schedule = database.getSchedule();
+    
+    if (!schedule[weekKey]) schedule[weekKey] = {};
+    if (!schedule[weekKey][employeeId]) schedule[weekKey][employeeId] = {};
+    
+    schedule[weekKey][employeeId][dayIndex] = shiftId;
+    database.saveSchedule(schedule);
+    
+    renderSchedule();
+    document.getElementById('scheduleModal').style.display = 'none';
+    
+    showNotification('Escala definida!', 'success');
+}
+
+function openSectorModal(employeeId, dayIndex, employeeName, date) {
+    if (isViewMode) return;
+    
+    currentEditing = { employeeId, dayIndex, type: 'sector' };
+    
+    const dayName = database.formatDayName(date);
+    const dateStr = database.formatDate(date);
+    
+    document.getElementById('sectorInfo').textContent = 
+        `Definir setor para ${employeeName} em ${dayName} (${dateStr})`;
+    
+    const sectorSelect = document.getElementById('sectorSelect');
+    sectorSelect.innerHTML = '<option value="">-- Selecione um setor --</option>';
+    
+    const sectors = database.getSectors();
+    sectors.forEach(sector => {
+        const option = document.createElement('option');
+        option.value = sector.id;
+        option.textContent = sector.name;
+        sectorSelect.appendChild(option);
+    });
+    
+    const weekKey = database.getWeekKey(currentWeekStart);
+    const schedule = database.getSectorSchedule();
+    const currentSectorId = schedule[weekKey] && schedule[weekKey][employeeId] && schedule[weekKey][employeeId][dayIndex];
+    
+    if (currentSectorId) {
+        sectorSelect.value = currentSectorId;
+    }
+    
+    document.getElementById('sectorModal').style.display = 'flex';
+}
+
+function saveSector() {
+    const sectorId = document.getElementById('sectorSelect').value;
+    const { employeeId, dayIndex } = currentEditing;
+    const weekKey = database.getWeekKey(currentWeekStart);
+    let schedule = database.getSectorSchedule();
+    
+    if (!sectorId) {
+        showNotification('Selecione um setor!', 'warning');
+        return;
+    }
+    
+    if (!schedule[weekKey]) schedule[weekKey] = {};
+    if (!schedule[weekKey][employeeId]) schedule[weekKey][employeeId] = {};
+    
+    schedule[weekKey][employeeId][dayIndex] = parseInt(sectorId);
+    database.saveSectorSchedule(schedule);
+    
+    renderSectorSchedule();
+    document.getElementById('sectorModal').style.display = 'none';
+    
+    showNotification('Setor definido!', 'success');
+}
+
+// ========== IMPRESSÃO MELHORADA ==========
+function printSchedule() {
+    // Salvar estado atual
+    const currentActiveTab = currentTab;
+    
+    // Criar janela de impressão
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Escala de Trabalho</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; }
+                h2 { color: #3498db; margin-top: 30px; }
+                .week-info { 
+                    text-align: center; 
+                    font-size: 1.2em; 
+                    margin-bottom: 20px;
+                    padding: 10px;
+                    background-color: #f5f5f5;
+                    border-radius: 5px;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 30px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 10px; 
+                    text-align: center;
+                }
+                th { 
+                    background-color: #2c3e50; 
+                    color: white;
+                    font-weight: bold;
+                }
+                td:first-child { 
+                    font-weight: bold; 
+                    background-color: #f9f9f9;
+                }
+                .shift-label { font-weight: bold; }
+                .shift-time { font-size: 0.9em; color: #555; }
+                .page-break { page-break-after: always; }
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+    `);
+    
+    // Adicionar data/hora
+    const now = new Date();
+    printWindow.document.write(`
+        <div class="no-print" style="text-align: right; margin-bottom: 20px; font-size: 0.9em; color: #666;">
+            Gerado em: ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}
+        </div>
+    `);
+    
+    // ESCALA DE TURNOS
+    printWindow.document.write('<h1>ESCALA DE TURNOS</h1>');
+    printWindow.document.write(`<div class="week-info">${document.getElementById('weekDisplay').textContent}</div>`);
+    
+    const scheduleTable = document.getElementById('scheduleTable').cloneNode(true);
+    // Remover eventos e limpar células vazias
+    scheduleTable.querySelectorAll('td').forEach(td => {
+        if (td.innerHTML.includes('Clique para definir') || td.innerHTML.includes('Não definido')) {
+            td.innerHTML = '';
+        }
+    });
+    printWindow.document.write(scheduleTable.outerHTML);
+    
+    // Adicionar quebra de página
+    printWindow.document.write('<div class="page-break"></div>');
+    
+    // ESCALA DE SETORES
+    printWindow.document.write('<h1>ESCALA DE SETORES</h1>');
+    printWindow.document.write(`<div class="week-info">${document.getElementById('weekDisplaySector').textContent}</div>`);
+    
+    const sectorTable = document.getElementById('sectorTable').cloneNode(true);
+    // Remover eventos e limpar células vazias
+    sectorTable.querySelectorAll('td').forEach(td => {
+        if (td.innerHTML.includes('Clique para definir') || td.innerHTML.includes('Não definido')) {
+            td.innerHTML = '';
+        }
+    });
+    printWindow.document.write(sectorTable.outerHTML);
+    
+    // Legenda
+    printWindow.document.write('<h2>Legenda</h2>');
+    
+    const shifts = database.getShifts();
+    printWindow.document.write('<h3>Turnos:</h3><ul>');
+    shifts.forEach(shift => {
+        printWindow.document.write(`<li><strong>${shift.name}:</strong> ${shift.time}</li>`);
+    });
+    printWindow.document.write('</ul>');
+    
+    const sectors = database.getSectors();
+    printWindow.document.write('<h3>Setores:</h3><ul>');
+    sectors.forEach(sector => {
+        printWindow.document.write(`<li>${sector.name}</li>`);
+    });
+    printWindow.document.write('</ul>');
+    
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    
+    // Imprimir após carregar
+    printWindow.onload = function() {
+        printWindow.print();
+        printWindow.close();
+    };
+}
+
 // ========== NOTIFICAÇÕES ==========
 function showNotification(message, type) {
     const existing = document.querySelector('.notification');
@@ -672,20 +1016,4 @@ function showNotification(message, type) {
     }, 3000);
 }
 
-// Fechar modais ao tocar fora
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
-    }
-});
-
-// Fechar modais com ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-    }
-});
-
-console.log('Dashboard inicializado com sucesso!');
+console.log('Script carregado com sucesso!');

@@ -1,23 +1,19 @@
-// Banco de dados híbrido (localStorage + backup online)
+// Banco de dados local com Firebase (opcional)
 class Database {
     constructor() {
-        this.apiUrl = 'https://jsonbin.io/v3/b'; // Exemplo de API gratuita
-        this.apiKey = 'YOUR_API_KEY'; // Você precisa criar uma conta no JSONBin.io
-        this.binId = null;
-        this.isOnline = false;
-        this.user = null;
         this.initializeDB();
+        this.firebaseConfig = null; // Configurar se quiser usar Firebase
     }
 
-    async initializeDB() {
-        // Verificar se está logado
+    initializeDB() {
+        console.log('Inicializando banco de dados...');
+        
+        // Verificar se existe usuário logado
         const userData = sessionStorage.getItem('user');
-        if (userData) {
-            this.user = JSON.parse(userData);
-        }
+        this.user = userData ? JSON.parse(userData) : null;
         
         // Inicializar dados padrão se não existirem
-        if (!localStorage.getItem('employees')) {
+        if (!localStorage.getItem('escala_employees')) {
             const defaultEmployees = [
                 { id: 1, name: "BEATRIZ XIMENES", role: "ASSISTENTE DE LOJA" },
                 { id: 2, name: "FABRICIO", role: "ASSISTENTE DE LOJA" },
@@ -26,9 +22,10 @@ class Database {
                 { id: 5, name: "KEVEN", role: "Gerente" }
             ];
             this.saveEmployees(defaultEmployees);
+            console.log('Colaboradores padrão criados');
         }
 
-        if (!localStorage.getItem('shifts')) {
+        if (!localStorage.getItem('escala_shifts')) {
             const defaultShifts = [
                 { id: 1, name: "Abertura", time: "06:00 - 14:00", color: "#3498db" },
                 { id: 2, name: "Intermediário", time: "14:00 - 22:00", color: "#f39c12" },
@@ -36,9 +33,10 @@ class Database {
                 { id: 4, name: "Folga", time: "Dia Livre", color: "#95a5a6" }
             ];
             this.saveShifts(defaultShifts);
+            console.log('Turnos padrão criados');
         }
 
-        if (!localStorage.getItem('sectors')) {
+        if (!localStorage.getItem('escala_sectors')) {
             const defaultSectors = [
                 { id: 1, name: "Masculino", color: this.generateColor(1) },
                 { id: 2, name: "Feminino", color: this.generateColor(2) },
@@ -48,40 +46,31 @@ class Database {
                 { id: 6, name: "Estoque", color: this.generateColor(6) }
             ];
             this.saveSectors(defaultSectors);
+            console.log('Setores padrão criados');
         }
 
-        if (!localStorage.getItem('schedule')) {
+        if (!localStorage.getItem('escala_schedule')) {
             this.saveSchedule({});
+            console.log('Escala inicializada');
         }
 
-        if (!localStorage.getItem('sectorSchedule')) {
+        if (!localStorage.getItem('escala_sector_schedule')) {
             this.saveSectorSchedule({});
+            console.log('Escala de setores inicializada');
         }
 
-        // Tentar carregar dados online (se API configurada)
-        if (this.user && this.user.type === 'admin') {
-            await this.trySyncOnline();
-        }
-    }
-
-    // Gerar cor consistente baseada no ID
-    generateColor(id) {
-        const colors = [
-            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
-            '#1abc9c', '#d35400', '#c0392b', '#16a085', '#8e44ad',
-            '#27ae60', '#2980b9', '#f1c40f', '#e67e22', '#34495e'
-        ];
-        return colors[id % colors.length];
+        console.log('Banco de dados inicializado com sucesso!');
     }
 
     // ========== FUNCIONÁRIOS ==========
     getEmployees() {
-        return JSON.parse(localStorage.getItem('employees')) || [];
+        const data = localStorage.getItem('escala_employees');
+        return data ? JSON.parse(data) : [];
     }
 
     saveEmployees(employees) {
-        localStorage.setItem('employees', JSON.stringify(employees));
-        this.scheduleBackup();
+        localStorage.setItem('escala_employees', JSON.stringify(employees));
+        console.log('Colaboradores salvos:', employees.length);
     }
 
     addEmployee(employee) {
@@ -90,11 +79,13 @@ class Database {
         employee.id = newId;
         employees.push(employee);
         this.saveEmployees(employees);
+        console.log('Colaborador adicionado:', employee);
         return employee;
     }
 
     removeEmployee(id) {
         let employees = this.getEmployees();
+        const employee = employees.find(e => e.id === id);
         employees = employees.filter(emp => emp.id !== id);
         this.saveEmployees(employees);
         
@@ -117,17 +108,19 @@ class Database {
         this.saveSchedule(schedule);
         this.saveSectorSchedule(sectorSchedule);
         
+        console.log('Colaborador removido:', employee);
         return true;
     }
 
     // ========== TURNOS ==========
     getShifts() {
-        return JSON.parse(localStorage.getItem('shifts')) || [];
+        const data = localStorage.getItem('escala_shifts');
+        return data ? JSON.parse(data) : [];
     }
 
     saveShifts(shifts) {
-        localStorage.setItem('shifts', JSON.stringify(shifts));
-        this.scheduleBackup();
+        localStorage.setItem('escala_shifts', JSON.stringify(shifts));
+        console.log('Turnos salvos:', shifts.length);
     }
 
     addShift(shift) {
@@ -136,11 +129,13 @@ class Database {
         shift.id = newId;
         shifts.push(shift);
         this.saveShifts(shifts);
+        console.log('Turno adicionado:', shift);
         return shift;
     }
 
     removeShift(id) {
         let shifts = this.getShifts();
+        const shift = shifts.find(s => s.id === id);
         shifts = shifts.filter(shift => shift.id !== id);
         this.saveShifts(shifts);
         
@@ -157,12 +152,14 @@ class Database {
         }
         this.saveSchedule(schedule);
         
+        console.log('Turno removido:', shift);
         return true;
     }
 
     // ========== SETORES ==========
     getSectors() {
-        const sectors = JSON.parse(localStorage.getItem('sectors')) || [];
+        const data = localStorage.getItem('escala_sectors');
+        const sectors = data ? JSON.parse(data) : [];
         // Garantir que todos os setores tenham cor
         return sectors.map(sector => ({
             ...sector,
@@ -171,8 +168,8 @@ class Database {
     }
 
     saveSectors(sectors) {
-        localStorage.setItem('sectors', JSON.stringify(sectors));
-        this.scheduleBackup();
+        localStorage.setItem('escala_sectors', JSON.stringify(sectors));
+        console.log('Setores salvos:', sectors.length);
     }
 
     addSector(sector) {
@@ -182,11 +179,13 @@ class Database {
         sector.color = this.generateColor(newId);
         sectors.push(sector);
         this.saveSectors(sectors);
+        console.log('Setor adicionado:', sector);
         return sector;
     }
 
     removeSector(id) {
         let sectors = this.getSectors();
+        const sector = sectors.find(s => s.id === id);
         sectors = sectors.filter(sector => sector.id !== id);
         this.saveSectors(sectors);
         
@@ -203,153 +202,45 @@ class Database {
         }
         this.saveSectorSchedule(sectorSchedule);
         
+        console.log('Setor removido:', sector);
         return true;
     }
 
     // ========== ESCALAS ==========
     getSchedule() {
-        return JSON.parse(localStorage.getItem('schedule')) || {};
+        const data = localStorage.getItem('escala_schedule');
+        return data ? JSON.parse(data) : {};
     }
 
     saveSchedule(schedule) {
-        localStorage.setItem('schedule', JSON.stringify(schedule));
-        this.scheduleBackup();
+        localStorage.setItem('escala_schedule', JSON.stringify(schedule));
     }
 
     getSectorSchedule() {
-        return JSON.parse(localStorage.getItem('sectorSchedule')) || {};
+        const data = localStorage.getItem('escala_sector_schedule');
+        return data ? JSON.parse(data) : {};
     }
 
     saveSectorSchedule(schedule) {
-        localStorage.setItem('sectorSchedule', JSON.stringify(schedule));
-        this.scheduleBackup();
-    }
-
-    // ========== BACKUP ONLINE ==========
-    async scheduleBackup() {
-        if (this.user && this.user.type === 'admin') {
-            // Usar setTimeout para evitar muitas chamadas seguidas
-            if (this.backupTimeout) clearTimeout(this.backupTimeout);
-            this.backupTimeout = setTimeout(() => this.backupToCloud(), 5000);
-        }
-    }
-
-    async backupToCloud() {
-        try {
-            const data = this.getAllData();
-            
-            // Se tiver um binId salvo, atualizar
-            if (this.binId) {
-                await this.updateOnlineData(data);
-            } else {
-                // Criar novo bin
-                await this.createOnlineData(data);
-            }
-            
-            console.log('Backup online realizado com sucesso');
-        } catch (error) {
-            console.error('Erro no backup online:', error);
-        }
-    }
-
-    async trySyncOnline() {
-        try {
-            // Tentar carregar dados do último backup
-            const savedBinId = localStorage.getItem('onlineBinId');
-            if (savedBinId) {
-                const onlineData = await this.getOnlineData(savedBinId);
-                if (onlineData) {
-                    // Mesclar dados online com locais
-                    this.mergeData(onlineData);
-                    console.log('Dados online carregados');
-                    this.isOnline = true;
-                }
-            }
-        } catch (error) {
-            console.log('Usando dados locais');
-        }
-    }
-
-    getAllData() {
-        return {
-            employees: this.getEmployees(),
-            shifts: this.getShifts(),
-            sectors: this.getSectors(),
-            schedule: this.getSchedule(),
-            sectorSchedule: this.getSectorSchedule(),
-            lastSync: new Date().toISOString()
-        };
-    }
-
-    mergeData(onlineData) {
-        // Lógica para mesclar dados online com locais
-        // (pode ser personalizada conforme necessidade)
-        if (onlineData.employees) {
-            const localEmployees = this.getEmployees();
-            const merged = [...onlineData.employees];
-            
-            // Adicionar locais que não existem online
-            localEmployees.forEach(local => {
-                if (!merged.find(online => online.id === local.id)) {
-                    merged.push(local);
-                }
-            });
-            
-            this.saveEmployees(merged);
-        }
-        
-        // Similar para outros dados...
-    }
-
-    // Métodos para API (exemplo com JSONBin.io)
-    async createOnlineData(data) {
-        // Implementação da API
-        // Você precisa se cadastrar em jsonbin.io para obter uma API key
-        return null;
-    }
-
-    async updateOnlineData(data) {
-        // Implementação da API
-        return null;
-    }
-
-    async getOnlineData(binId) {
-        // Implementação da API
-        return null;
-    }
-
-    // ========== EXPORT/IMPORT ==========
-    exportData() {
-        const data = this.getAllData();
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const link = document.createElement('a');
-        link.setAttribute('href', dataUri);
-        link.setAttribute('download', `escala-backup-${new Date().toISOString().split('T')[0]}.json`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    importData(jsonData) {
-        try {
-            const data = JSON.parse(jsonData);
-            
-            if (data.employees) this.saveEmployees(data.employees);
-            if (data.shifts) this.saveShifts(data.shifts);
-            if (data.sectors) this.saveSectors(data.sectors);
-            if (data.schedule) this.saveSchedule(data.schedule);
-            if (data.sectorSchedule) this.saveSectorSchedule(data.sectorSchedule);
-            
-            return true;
-        } catch (error) {
-            console.error('Erro ao importar dados:', error);
-            return false;
-        }
+        localStorage.setItem('escala_sector_schedule', JSON.stringify(schedule));
     }
 
     // ========== UTILIDADES ==========
+    generateColor(id) {
+        const colors = [
+            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+            '#1abc9c', '#d35400', '#c0392b', '#16a085', '#8e44ad',
+            '#27ae60', '#2980b9', '#f1c40f', '#e67e22', '#34495e',
+            '#7f8c8d', '#2c3e50', '#95a5a6', '#bdc3c7'
+        ];
+        return colors[id % colors.length];
+    }
+
+    getSectorColor(sectorId) {
+        const sector = this.getSectors().find(s => s.id === sectorId);
+        return sector ? sector.color : '#95a5a6';
+    }
+
     getWeekStartDate(date) {
         const d = new Date(date);
         const day = d.getDay();
@@ -400,11 +291,69 @@ class Database {
         return days[date.getDay()];
     }
 
-    getSectorColor(sectorId) {
-        const sector = this.getSectors().find(s => s.id === sectorId);
-        return sector ? sector.color : '#95a5a6';
+    // ========== EXPORT/IMPORT ==========
+    exportData() {
+        const data = {
+            employees: this.getEmployees(),
+            shifts: this.getShifts(),
+            sectors: this.getSectors(),
+            schedule: this.getSchedule(),
+            sectorSchedule: this.getSectorSchedule(),
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
+        
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', dataUri);
+        link.setAttribute('download', `escala-backup-${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log('Dados exportados');
+        return data;
+    }
+
+    importData(jsonData) {
+        try {
+            const data = JSON.parse(jsonData);
+            
+            if (data.employees) this.saveEmployees(data.employees);
+            if (data.shifts) this.saveShifts(data.shifts);
+            if (data.sectors) this.saveSectors(data.sectors);
+            if (data.schedule) this.saveSchedule(data.schedule);
+            if (data.sectorSchedule) this.saveSectorSchedule(data.sectorSchedule);
+            
+            console.log('Dados importados com sucesso');
+            return true;
+        } catch (error) {
+            console.error('Erro ao importar dados:', error);
+            return false;
+        }
+    }
+
+    // ========== BACKUP ONLINE SIMPLES ==========
+    // Método simples usando um servidor gratuito (GitHub Gist)
+    async backupToGithub() {
+        // Implementação opcional
+        return null;
+    }
+
+    // ========== OBTER TODOS OS DADOS ==========
+    getAllData() {
+        return {
+            employees: this.getEmployees(),
+            shifts: this.getShifts(),
+            sectors: this.getSectors(),
+            schedule: this.getSchedule(),
+            sectorSchedule: this.getSectorSchedule(),
+            lastSync: new Date().toISOString()
+        };
     }
 }
 
-// Exportar instância única do banco de dados
+// Criar instância global do banco de dados
 const db = new Database();
