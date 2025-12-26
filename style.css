@@ -829,259 +829,232 @@ td:first-child {
         margin: 20px 0;
     }
 }
-/* Painel de Status Firebase */
-.status-panel {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px;
-    max-height: 500px;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    z-index: 2001;
-    display: none;
-    flex-direction: column;
-    border: 1px solid #ddd;
+
+/* Adicione estas regras ao arquivo style.css existente */
+
+/* Estilos para células unificadas */
+.unified-cell {
+    min-height: 70px !important;
+    vertical-align: top !important;
 }
 
-.status-panel.show {
-    display: flex;
-}
-
-.status-header {
-    background: var(--primary-color);
-    color: white;
-    padding: 12px 15px;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.status-header h4 {
-    margin: 0;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-close-status {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.status-content {
-    padding: 15px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.status-item {
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-.status-label {
+.unified-cell .shift-label {
+    font-size: 0.9rem;
     font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.unified-cell .shift-time {
+    font-size: 0.75rem;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+.unified-cell .sector-info {
+    font-size: 0.75rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.5);
+    margin-top: 3px;
+}
+
+/* Célula do nome do colaborador */
+.employee-name-cell {
+    min-width: 150px !important;
+    position: sticky !important;
+    left: 0 !important;
+    background-color: white !important;
+    z-index: 5 !important;
+    border-right: 2px solid #eee !important;
+    font-size: 0.9rem !important;
+}
+
+.employee-name-cell small {
     color: #666;
-    display: block;
-    margin-bottom: 4px;
-    font-size: 0.9rem;
-}
-
-.status-value {
-    color: #333;
-    font-weight: 500;
-    display: block;
-    padding: 4px 8px;
-    background: #f5f5f5;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.status-value.online {
-    color: var(--success-color);
-    background-color: rgba(39, 174, 96, 0.1);
-}
-
-.status-value.offline {
-    color: var(--danger-color);
-    background-color: rgba(231, 76, 60, 0.1);
-}
-
-.status-value.syncing {
-    color: var(--warning-color);
-    background-color: rgba(243, 156, 18, 0.1);
-}
-
-.logs-container {
-    max-height: 150px;
-    overflow-y: auto;
-    background: #1a1a1a;
-    color: #f0f0f0;
-    padding: 10px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
     font-size: 0.8rem;
-    margin-top: 8px;
 }
 
-.log-entry {
-    padding: 4px 0;
-    border-bottom: 1px solid #333;
-    display: flex;
-    gap: 10px;
+/* Modal unificado */
+#sectorSelectContainer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
 
-.log-time {
-    color: #aaa;
-    min-width: 70px;
+/* Modo visualização simplificado */
+body.view-mode-simple .info-panels,
+body.view-mode-simple .header-controls,
+body.view-mode-simple .controls .btn:not(#todayBtn),
+body.view-mode-simple .week-navigation .btn:not(:first-child):not(:last-child),
+body.view-mode-simple #sector-tab,
+body.view-mode-simple .tab-btn[data-tab="sector"] {
+    display: none !important;
 }
 
-.log-message {
-    color: #fff;
-    flex: 1;
+body.view-mode-simple .container {
+    padding-top: 10px;
 }
 
-.log-success {
-    color: #4CAF50;
+body.view-mode-simple .schedule-container {
+    max-height: 70vh;
 }
 
-.log-warning {
-    color: #FF9800;
-}
-
-.log-error {
-    color: #F44336;
-}
-
-.log-info {
-    color: #2196F3;
-}
-
-.status-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.status-actions .btn {
-    flex: 1;
-    min-width: 100px;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-}
-
-/* Botão flutuante */
-.floating-status-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
+body.view-mode-simple header {
+    text-align: center;
     justify-content: center;
-    font-size: 1.2rem;
-    transition: all 0.3s;
 }
 
-.floating-status-btn:hover {
-    transform: scale(1.1);
-    background: var(--secondary-color);
+body.view-mode-simple .week-navigation {
+    justify-content: center;
+    gap: 20px;
 }
 
-.floating-status-btn.pulse {
-    animation: pulse 2s infinite;
+body.view-mode-simple .tabs {
+    justify-content: center;
 }
 
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-}
-
-/* Notificação toast */
-.firebase-toast {
+/* Status de sincronização */
+.sync-status {
     position: fixed;
-    top: 80px;
-    right: 20px;
-    padding: 12px 20px;
-    border-radius: var(--border-radius);
+    bottom: 10px;
+    right: 10px;
+    background-color: var(--primary-color);
     color: white;
-    font-weight: 600;
-    z-index: 10000;
-    box-shadow: var(--box-shadow);
-    animation: slideInRight 0.3s ease-out;
-    max-width: 300px;
-    backdrop-filter: blur(10px);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-out;
 }
 
-.firebase-toast.success {
-    background-color: rgba(39, 174, 96, 0.9);
-}
-
-.firebase-toast.error {
-    background-color: rgba(231, 76, 60, 0.9);
-}
-
-.firebase-toast.warning {
-    background-color: rgba(243, 156, 18, 0.9);
-}
-
-.firebase-toast.info {
-    background-color: rgba(52, 152, 219, 0.9);
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-/* Indicador de sincronização na tabela */
-.sync-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: middle;
-}
-
-.sync-indicator.synced {
-    background-color: var(--success-color);
-    animation: pulse 2s infinite;
-}
-
-.sync-indicator.pending {
+.sync-status.syncing {
     background-color: var(--warning-color);
 }
 
-.sync-indicator.error {
+.sync-status.error {
     background-color: var(--danger-color);
+}
+
+.sync-status.success {
+    background-color: var(--success-color);
+}
+
+.sync-status.hidden {
+    display: none;
+}
+
+/* Botão de sincronização */
+#syncBtn {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+}
+
+#syncBtn:hover {
+    background-color: #2980b9;
+    transform: scale(1.1);
+}
+
+#syncBtn.syncing i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsividade melhorada para impressão unificada */
+@media print {
+    body.view-mode-simple *,
+    body.view-mode * {
+        visibility: visible !important;
+    }
+    
+    body.view-mode-simple .top-bar,
+    body.view-mode-simple .tabs,
+    body.view-mode-simple .controls,
+    body.view-mode-simple .info-panels,
+    body.view-mode .top-bar,
+    body.view-mode .tabs,
+    body.view-mode .controls,
+    body.view-mode .info-panels {
+        display: none !important;
+    }
+    
+    .schedule-container {
+        max-height: none !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+    }
+    
+    table {
+        border: 2px solid #000 !important;
+    }
+    
+    th, td {
+        border: 1px solid #000 !important;
+        background-color: white !important;
+        color: black !important;
+        padding: 8px !important;
+    }
+    
+    .shift-label, .shift-time, .sector-info {
+        color: #000 !important;
+    }
+}
+
+/* Ajustes para mobile */
+@media (max-width: 768px) {
+    .unified-cell {
+        min-height: 60px !important;
+        padding: 5px !important;
+    }
+    
+    .unified-cell .shift-label {
+        font-size: 0.8rem;
+    }
+    
+    .unified-cell .shift-time {
+        font-size: 0.7rem;
+    }
+    
+    .unified-cell .sector-info {
+        font-size: 0.7rem;
+    }
+    
+    .employee-name-cell {
+        min-width: 120px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .sync-status {
+        bottom: 60px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+    }
+    
+    #syncBtn {
+        bottom: 60px;
+    }
 }
 
 /* Status de sincronização */

@@ -6,10 +6,6 @@
     <title>Sistema de Controle de Escalas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-        <!-- Adicione isso antes do fechamento do </head> -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Barra superior -->
@@ -45,11 +41,11 @@
         </header>
 
         <div class="tabs">
-            <button class="tab-btn active" data-tab="scale">Escala de Turnos</button>
-            <button class="tab-btn" data-tab="sector">Escala de Setores</button>
+            <button class="tab-btn active" data-tab="scale">Escala Completa</button>
+            <button class="tab-btn" data-tab="sector">Apenas Setores (Legado)</button>
         </div>
 
-        <!-- Aba de Escala de Turnos -->
+        <!-- Aba de Escala Completa (Unificada) -->
         <div class="tab-content active" id="scale-tab">
             <div class="controls">
                 <button class="btn btn-primary" id="prevWeek">
@@ -90,7 +86,7 @@
             </div>
         </div>
 
-        <!-- Aba de Escala de Setores -->
+        <!-- Aba de Escala de Setores (Legado - mantida para compatibilidade) -->
         <div class="tab-content" id="sector-tab">
             <div class="controls">
                 <button class="btn btn-primary" id="prevWeekSector">
@@ -139,7 +135,7 @@
         </div>
     </div>
 
-    <!-- Modais FIXOS (não dinâmicos) -->
+    <!-- Modais -->
     <div class="modal" id="employeeModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -276,50 +272,20 @@
     <!-- Importar arquivo (hidden) -->
     <input type="file" id="importFile" accept=".json" style="display: none;">
     
+    <!-- Botão de sincronização Supabase -->
+    <button id="syncBtn" title="Sincronizar com Supabase">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+    
+    <!-- Status da sincronização -->
+    <div id="syncStatus" class="sync-status hidden">
+        <i class="fas fa-sync-alt"></i>
+        <span>Conectando...</span>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="supabase.js"></script>
     <script src="db.js"></script>
     <script src="script.js"></script>
-    <!-- Painel de Status Firebase (visível apenas para admin) -->
-<div class="status-panel" id="statusPanel">
-    <div class="status-header">
-        <h4><i class="fas fa-database"></i> Status do Banco de Dados</h4>
-        <button class="btn-close-status">&times;</button>
-    </div>
-    <div class="status-content">
-        <div class="status-item">
-            <span class="status-label">Conexão:</span>
-            <span class="status-value" id="statusConnection">Verificando...</span>
-        </div>
-        <div class="status-item">
-            <span class="status-label">Última sincronização:</span>
-            <span class="status-value" id="statusLastSync">Nunca</span>
-        </div>
-        <div class="status-item">
-            <span class="status-label">Dados sincronizados:</span>
-            <span class="status-value" id="statusDataCount">0</span>
-        </div>
-        <div class="status-item">
-            <span class="status-label">Logs:</span>
-            <div class="logs-container" id="logsContainer">
-                <!-- Logs serão adicionados aqui -->
-            </div>
-        </div>
-        <div class="status-actions">
-            <button class="btn btn-sm btn-primary" id="refreshStatus">
-                <i class="fas fa-sync"></i> Atualizar
-            </button>
-            <button class="btn btn-sm btn-warning" id="clearLogs">
-                <i class="fas fa-trash"></i> Limpar Logs
-            </button>
-            <button class="btn btn-sm btn-success" id="forceSync">
-                <i class="fas fa-cloud-upload-alt"></i> Forçar Sincronização
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Botão flutuante para abrir painel de status -->
-<button class="floating-status-btn" id="floatingStatusBtn">
-    <i class="fas fa-server"></i>
-</button>
 </body>
 </html>

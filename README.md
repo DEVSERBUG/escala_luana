@@ -1,43 +1,55 @@
+# Sistema de Controle de Escalas v2.0
 
-## Banco de Dados
+Sistema web completo para gerenciamento de escalas de trabalho com integração Supabase para armazenamento em nuvem.
 
-O sistema usa `localStorage` para persistência de dados:
-- `employees`: Lista de colaboradores
-- `shifts`: Turnos disponíveis
-- `sectors`: Setores disponíveis
-- `schedule`: Escalas de turnos
-- `sectorSchedule`: Escalas de setores
+## 🚀 Funcionalidades
 
-## Recursos Técnicos
+### ✨ Novas na v2.0
+- ✅ **Escala Unificada**: Turno + Setor na mesma célula
+- ✅ **Supabase Integration**: Armazenamento em nuvem gratuito
+- ✅ **Modo Visualização Simplificado**: Interface limpa para colaboradores
+- ✅ **Impressão Otimizada**: Layout profissional para impressão
+- ✅ **Sincronização Automática**: Dados sempre atualizados
 
-- **Design Responsivo**: Funciona em desktop e mobile
-- **Persistência Local**: Dados salvos automaticamente
-- **Interface Intuitiva**: Navegação simples e clara
-- **Exportação**: Impressão direta das escalas
+### 📋 Funcionalidades Existentes
+- Cadastro de colaboradores
+- Gerenciamento de turnos e setores
+- Escalas semanais
+- Exportação/Importação de dados
+- Navegação entre semanas
+- Cópia de escala anterior
 
-## Tecnologias Utilizadas
+## 🌐 Acesso Online
 
-- HTML5
-- CSS3 (Flexbox, Grid)
-- JavaScript Vanilla
-- Font Awesome (ícones)
-- localStorage (armazenamento)
+1. **GitHub Pages**: https://seu-usuario.github.io/sistema-escalas
+2. **Custom Domain**: (Opcional) Configure seu próprio domínio
 
-## Implantação
+## 🔧 Configuração
 
-Para subir o projeto no GitHub Pages:
+### 1. Supabase (Armazenamento em Nuvem)
 
-1. Crie um repositório no GitHub
-2. Faça upload dos arquivos
-3. Ative o GitHub Pages nas configurações
-4. Acesse o link fornecido
+1. Acesse [Supabase](https://supabase.com)
+2. Crie uma conta gratuita
+3. Crie um novo projeto
+4. No SQL Editor, execute:
 
-## Personalização
+```sql
+-- Tabela para armazenar os dados das escalas
+CREATE TABLE escala_data (
+    id SERIAL PRIMARY KEY,
+    company_id TEXT NOT NULL DEFAULT 'default',
+    data JSONB NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(company_id)
+);
 
-- **Cores**: Edite as variáveis CSS em `:root`
-- **Turnos**: Adicione/remova turnos conforme necessidade
-- **Setores**: Adapte os setores para sua realidade
+-- Habilitar RLS (Row Level Security)
+ALTER TABLE escala_data ENABLE ROW LEVEL SECURITY;
 
-## Licença
+-- Política para leitura pública (ajuste conforme necessidade)
+CREATE POLICY "Permitir leitura pública" ON escala_data
+    FOR SELECT USING (true);
 
-Livre para uso e modificação.
+-- Política para escrita apenas autenticada (recomendado)
+CREATE POLICY "Permitir escrita apenas para autenticados" ON escala_data
+    FOR ALL USING (auth.role() = 'authenticated');
